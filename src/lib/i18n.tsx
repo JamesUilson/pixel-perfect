@@ -45,7 +45,7 @@ export const dict = {
   "home.explore": { uz: "Mos mahsulotlar", ru: "Подходящие товары" },
   "home.openGarage": { uz: "Garajni ochish", ru: "Открыть гараж" },
   "home.categories": { uz: "Kategoriyalar", ru: "Категории" },
-  "home.trending": { uz: "Trendda", ru": "В тренде" } as never,
+  "home.trending": { uz: "Trendda", ru: "В тренде" },
   "home.nearby": { uz: "Yaqin sotuvchilar", ru: "Продавцы рядом" },
   "home.deals": { uz: "Chegirmalar", ru: "Скидки" },
   "home.fromFeed": { uz: "Lentadan", ru: "Из ленты" },
