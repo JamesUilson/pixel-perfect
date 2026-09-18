@@ -5,21 +5,33 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * MOTORA design system — premium automotive social commerce.
- * Foundation: graphite + warm white. One electric accent used sparingly.
+ * AVTOQISM design system.
+ *
+ * Editorial automotive interface: warm off-white ground, near-black text, one
+ * red accent used with discipline, sharp corners, Sora for display and Manrope
+ * for text. The feed keeps its own dark surface palette.
+ *
+ * Token contract:
+ *   - every colour is oklch and lives in :root / .dark;
+ *   - @theme inline maps it to a Tailwind utility;
+ *   - components never hardcode a colour.
+ *
+ * `--accent-electric` is kept as an alias of the brand accent so that older
+ * markup keeps working while the whole surface reads as one brand.
  */
 
 @theme inline {
-  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 24px;
-  --radius-4xl: 28px;
+  /* Sharp, editorial corner scale. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+  --radius-3xl: 12px;
+  --radius-4xl: 16px;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -42,6 +54,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
@@ -51,67 +64,86 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  --shadow-raise: 0 1px 2px oklch(0.2 0.02 260 / 6%), 0 8px 24px -16px oklch(0.2 0.02 260 / 30%);
-  --shadow-float: 0 2px 6px oklch(0.2 0.02 260 / 8%), 0 20px 48px -28px oklch(0.2 0.02 260 / 40%);
+  /* Dark surface used by the social feed, in both themes. */
+  --color-feed: var(--feed);
+  --color-feed-foreground: var(--feed-foreground);
+  --color-feed-muted: var(--feed-muted);
+  --color-feed-border: var(--feed-border);
+
+  --shadow-raise:
+    0 1px 2px oklch(0.19 0.012 255 / 6%), 0 8px 24px -18px oklch(0.19 0.012 255 / 28%);
+  --shadow-float:
+    0 2px 6px oklch(0.19 0.012 255 / 8%), 0 20px 48px -30px oklch(0.19 0.012 255 / 38%);
 }
 
 :root {
-  --background: oklch(0.982 0.004 95);
-  --foreground: oklch(0.205 0.012 260);
+  --background: oklch(0.978 0.004 78);
+  --foreground: oklch(0.19 0.012 255);
   --surface: oklch(1 0 0);
-  --surface-foreground: oklch(0.205 0.012 260);
+  --surface-foreground: oklch(0.19 0.012 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.205 0.012 260);
+  --card-foreground: oklch(0.19 0.012 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.205 0.012 260);
+  --popover-foreground: oklch(0.19 0.012 255);
 
-  /* Graphite foundation */
-  --primary: oklch(0.235 0.013 262);
-  --primary-foreground: oklch(0.985 0.003 95);
+  /* The single AVTOQISM accent. */
+  --primary: oklch(0.59 0.2 32);
+  --primary-foreground: oklch(0.99 0.002 80);
+  --accent-electric: oklch(0.59 0.2 32);
+  --accent-electric-foreground: oklch(0.99 0.002 80);
 
-  /* Single electric automotive accent */
-  --accent-electric: oklch(0.63 0.176 243);
-  --accent-electric-foreground: oklch(0.99 0.003 95);
+  --secondary: oklch(0.955 0.005 78);
+  --secondary-foreground: oklch(0.19 0.012 255);
+  --muted: oklch(0.94 0.006 75);
+  --muted-foreground: oklch(0.49 0.014 255);
+  --accent: oklch(0.955 0.006 60);
+  --accent-foreground: oklch(0.19 0.012 255);
 
-  --secondary: oklch(0.955 0.005 95);
-  --secondary-foreground: oklch(0.235 0.013 262);
-  --muted: oklch(0.955 0.005 95);
-  --muted-foreground: oklch(0.525 0.012 262);
-  --accent: oklch(0.945 0.008 240);
-  --accent-foreground: oklch(0.235 0.013 262);
-
-  --destructive: oklch(0.567 0.208 25);
-  --destructive-foreground: oklch(0.99 0.003 95);
-  --success: oklch(0.575 0.132 152);
-  --success-foreground: oklch(0.99 0.003 95);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.002 80);
+  --success: oklch(0.5 0.15 150);
+  --success-soft: oklch(0.94 0.045 150);
+  --success-foreground: oklch(0.99 0.002 80);
   --warning: oklch(0.72 0.152 72);
   --warning-foreground: oklch(0.22 0.02 72);
 
-  --border: oklch(0.915 0.005 95);
-  --border-strong: oklch(0.855 0.007 95);
-  --input: oklch(0.905 0.005 95);
-  --ring: oklch(0.63 0.176 243);
+  --border: oklch(0.87 0.008 75);
+  --border-strong: oklch(0.79 0.01 75);
+  --input: oklch(0.87 0.008 75);
+  --ring: oklch(0.59 0.2 32);
+
+  --feed: oklch(0.12 0.012 255);
+  --feed-foreground: oklch(0.98 0.003 80);
+  --feed-muted: oklch(0.76 0.008 255);
+  --feed-border: oklch(1 0 0 / 18%);
 }
 
 .dark {
-  --background: oklch(0.175 0.009 262);
-  --foreground: oklch(0.975 0.003 95);
-  --surface: oklch(0.215 0.011 262);
-  --surface-foreground: oklch(0.975 0.003 95);
-  --card: oklch(0.215 0.011 262);
-  --card-foreground: oklch(0.975 0.003 95);
-  --popover: oklch(0.215 0.011 262);
-  --popover-foreground: oklch(0.975 0.003 95);
-  --primary: oklch(0.975 0.003 95);
-  --primary-foreground: oklch(0.205 0.012 262);
-  --secondary: oklch(0.265 0.012 262);
-  --secondary-foreground: oklch(0.975 0.003 95);
-  --muted: oklch(0.265 0.012 262);
-  --muted-foreground: oklch(0.715 0.012 262);
-  --accent: oklch(0.285 0.02 245);
-  --accent-foreground: oklch(0.975 0.003 95);
+  --background: oklch(0.145 0.012 255);
+  --foreground: oklch(0.975 0.003 80);
+  --surface: oklch(0.195 0.012 255);
+  --surface-foreground: oklch(0.975 0.003 80);
+  --card: oklch(0.195 0.012 255);
+  --card-foreground: oklch(0.975 0.003 80);
+  --popover: oklch(0.195 0.012 255);
+  --popover-foreground: oklch(0.975 0.003 80);
+
+  --primary: oklch(0.64 0.19 32);
+  --primary-foreground: oklch(0.99 0.002 80);
+  --accent-electric: oklch(0.64 0.19 32);
+  --accent-electric-foreground: oklch(0.99 0.002 80);
+
+  --secondary: oklch(0.255 0.012 255);
+  --secondary-foreground: oklch(0.975 0.003 80);
+  --muted: oklch(0.255 0.012 255);
+  --muted-foreground: oklch(0.72 0.012 255);
+  --accent: oklch(0.27 0.016 40);
+  --accent-foreground: oklch(0.975 0.003 80);
+
+  --success: oklch(0.62 0.14 150);
+  --success-soft: oklch(0.28 0.05 150);
   --border: oklch(1 0 0 / 12%);
-  --border-strong: oklch(1 0 0 / 20%);
+  --border-strong: oklch(1 0 0 / 22%);
   --input: oklch(1 0 0 / 16%);
 }
 
@@ -128,6 +160,8 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    letter-spacing: 0;
+    text-rendering: optimizeLegibility;
   }
 
   h1,
@@ -137,28 +171,44 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Keyboard focus is always visible; pointer focus is not. */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
 }
 
+/* --- type scale ---------------------------------------------------------- */
 @utility type-display {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
 }
 
 @utility type-h1 {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 600;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
 }
 
 @utility type-h2 {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
@@ -167,39 +217,40 @@
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.0625rem;
-  line-height: 1.25;
-  letter-spacing: -0.015em;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
 }
 
 @utility type-label {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 @utility type-caption {
-  font-size: 0.75rem;
-  line-height: 1.4;
+  font-size: 0.8125rem;
+  line-height: 1.45;
   color: var(--color-muted-foreground);
 }
 
 @utility type-price {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.125rem;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
 }
 
 @utility type-price-lg {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.875rem;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
 }
 
+/* --- behaviour ----------------------------------------------------------- */
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -208,5 +259,61 @@
 }
 
 @utility edge-fade {
-  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 16px,
+    black calc(100% - 16px),
+    transparent
+  );
+}
+
+@utility nav-link {
+  position: relative;
+  transition: color 200ms ease;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -2px;
+    height: 2px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform 250ms ease;
+  }
+  &[data-status="active"]::after {
+    transform: scaleX(1);
+  }
+}
+
+@utility image-zoom {
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  &:hover {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility enter-rise {
+  animation: rise 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

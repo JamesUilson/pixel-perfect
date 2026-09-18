@@ -1,38 +1,42 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { Page, PageTitle, EmptyState } from "@/components/motora/Page";
-import { ProductCard } from "@/components/motora/ProductCard";
-import { categories, products, type CategoryId } from "@/data/demo";
+
+import { EmptyState, Page, PageTitle } from "@/components/avtoqism/Page";
+import { ProductCard } from "@/components/avtoqism/ProductCard";
+import { ErrorState, ProductGridSkeleton } from "@/components/avtoqism/States";
 import { useLang, useT } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useCategories, useProducts } from "@/lib/query/catalog";
+import { useActiveVehicle } from "@/lib/query/garage";
 import { cn } from "@/lib/utils";
 
+const SORTS = ["relevance", "popular", "price_asc", "price_desc", "rating", "newest"] as const;
+type Sort = (typeof SORTS)[number];
+
 type Search = {
-  q?: string;
-  category?: CategoryId;
-  sort?: "popular" | "cheap" | "expensive" | "rating";
-  fit?: boolean;
+  q?: string | undefined;
+  category?: string | undefined;
+  sort?: Sort | undefined;
+  fit?: boolean | undefined;
+  in_stock?: boolean | undefined;
+  page?: number | undefined;
 };
 
 export const Route = createFileRoute("/marketplace")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    q: typeof search.q === "string" && search.q ? search.q : undefined,
-    category: categories.some((c) => c.id === search.category)
-      ? (search.category as CategoryId)
-      : undefined,
-    sort: ["popular", "cheap", "expensive", "rating"].includes(String(search.sort))
-      ? (search.sort as Search["sort"])
-      : undefined,
-    fit: search.fit === true || search.fit === "true" ? true : undefined,
+    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
+    category: typeof search["category"] === "string" ? search["category"] : undefined,
+    sort: SORTS.includes(search["sort"] as Sort) ? (search["sort"] as Sort) : undefined,
+    fit: search["fit"] === true || search["fit"] === "true" ? true : undefined,
+    in_stock: search["in_stock"] === true || search["in_stock"] === "true" ? true : undefined,
+    page: Number(search["page"]) > 1 ? Number(search["page"]) : undefined,
   }),
   head: () => ({
     meta: [
-      { title: "Marketplace — MOTORA" },
+      { title: "Katalog — AVTOQISM" },
       {
         name: "description",
         content: "Ehtiyot qismlarni kategoriya, narx va moslik bo'yicha filtrlang.",
       },
-      { property: "og:title", content: "Marketplace — MOTORA" },
+      { property: "og:title", content: "Katalog — AVTOQISM" },
       { property: "og:description", content: "Toshkentdagi sotuvchilardan mos detallar." },
     ],
   }),
@@ -44,124 +48,192 @@ function Marketplace() {
   const { lang } = useLang();
   const navigate = useNavigate({ from: "/marketplace" });
   const search = Route.useSearch();
-  const { activeVehicle } = useStore();
+  const { activeVehicle } = useActiveVehicle();
+
+  const categories = useCategories();
+  const products = useProducts({
+    q: search.q,
+    category: search.category,
+    sort: search.sort ?? "relevance",
+    fits_my_car: search.fit,
+    in_stock: search.in_stock,
+    page: search.page ?? 1,
+    size: 24,
+  });
 
   const setSearch = (patch: Partial<Search>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    void navigate({ search: (prev) => ({ ...prev, ...patch, page: undefined }) });
 
-  const list = useMemo(() => {
-    let out = products.slice();
-    if (search.q) {
-      const q = search.q.toLowerCase();
-      out = out.filter((p) =>
-        [p.nameUz, p.nameRu, p.brand, p.oem].some((v) => v.toLowerCase().includes(q)),
-      );
-    }
-    if (search.category) out = out.filter((p) => p.category === search.category);
-    if (search.fit && activeVehicle)
-      out = out.filter((p) => p.fitsModels.includes(activeVehicle.model));
+  const sortLabels: Record<Sort, string> = {
+    relevance: t("market.sortRelevance"),
+    popular: t("market.sortPopular"),
+    price_asc: t("market.sortCheap"),
+    price_desc: t("market.sortExpensive"),
+    rating: t("market.sortRating"),
+    newest: t("market.sortNewest"),
+  };
 
-    switch (search.sort) {
-      case "cheap":
-        out.sort((a, b) => a.price - b.price);
-        break;
-      case "expensive":
-        out.sort((a, b) => b.price - a.price);
-        break;
-      case "rating":
-        out.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        out.sort((a, b) => b.sold - a.sold);
-    }
-    return out;
-  }, [search, activeVehicle]);
-
-  const sorts = [
-    { id: "popular", label: t("market.sortPopular") },
-    { id: "cheap", label: t("market.sortCheap") },
-    { id: "expensive", label: t("market.sortExpensive") },
-    { id: "rating", label: t("market.sortRating") },
-  ] as const;
+  const total = products.data?.total ?? 0;
+  const hasFilters = Boolean(search.q || search.category || search.fit || search.in_stock);
 
   return (
     <Page>
       <PageTitle
+        eyebrow="AVTOQISM"
         title={t("market.title")}
-        subtitle={`${list.length} ${t("market.results")}${search.q ? ` · "${search.q}"` : ""}`}
+        subtitle={
+          products.isPending
+            ? t("common.loading")
+            : `${total} ${t("market.results")}${search.q ? ` · «${search.q}»` : ""}`
+        }
       />
 
+      {/* category chips */}
       <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-1">
         <button
           type="button"
           onClick={() => setSearch({ category: undefined })}
           className={cn(
-            "whitespace-nowrap rounded-md border px-3 py-2 text-sm font-semibold transition-colors",
+            "whitespace-nowrap border px-4 py-2.5 text-sm font-semibold transition-colors",
             !search.category
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-card",
+              ? "border-foreground bg-foreground text-background"
+              : "border-border bg-card hover:border-border-strong",
           )}
         >
           {t("common.all")}
         </button>
-        {categories.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => setSearch({ category: search.category === c.id ? undefined : c.id })}
-            className={cn(
-              "whitespace-nowrap rounded-md border px-3 py-2 text-sm font-semibold transition-colors",
-              search.category === c.id
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card",
-            )}
-          >
-            {lang === "uz" ? c.uz : c.ru}
-          </button>
-        ))}
+        {(categories.data ?? [])
+          .filter((c) => c.product_count > 0)
+          .map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() =>
+                setSearch({ category: search.category === c.slug ? undefined : c.slug })
+              }
+              className={cn(
+                "whitespace-nowrap border px-4 py-2.5 text-sm font-semibold transition-colors",
+                search.category === c.slug
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-card hover:border-border-strong",
+              )}
+            >
+              {lang === "uz" ? c.name_uz : (c.name_ru ?? c.name_uz)}
+            </button>
+          ))}
       </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      {/* filters + sort */}
+      <div className="mb-8 flex flex-wrap items-center gap-2 border-y border-border py-3">
         {activeVehicle && (
           <button
             type="button"
             onClick={() => setSearch({ fit: search.fit ? undefined : true })}
+            aria-pressed={Boolean(search.fit)}
             className={cn(
-              "rounded-md border px-3 py-2 text-sm font-semibold transition-colors",
+              "border px-3 py-2 text-sm font-semibold transition-colors",
               search.fit
-                ? "border-accent-electric bg-accent-electric text-accent-electric-foreground"
-                : "border-border bg-card",
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card hover:border-border-strong",
             )}
           >
             {t("fit.filter")}
           </button>
         )}
-        <span className="type-caption ml-auto">{t("market.sort")}:</span>
-        {sorts.map((s) => (
+        <button
+          type="button"
+          onClick={() => setSearch({ in_stock: search.in_stock ? undefined : true })}
+          aria-pressed={Boolean(search.in_stock)}
+          className={cn(
+            "border px-3 py-2 text-sm font-semibold transition-colors",
+            search.in_stock
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-card hover:border-border-strong",
+          )}
+        >
+          {t("market.onlyInStock")}
+        </button>
+
+        {hasFilters && (
           <button
-            key={s.id}
             type="button"
-            onClick={() => setSearch({ sort: s.id })}
-            className={cn(
-              "rounded-md px-3 py-2 text-sm font-semibold transition-colors",
-              (search.sort ?? "popular") === s.id
-                ? "bg-secondary text-foreground"
-                : "text-muted-foreground",
-            )}
+            onClick={() => void navigate({ search: {} })}
+            className="px-3 py-2 text-sm font-semibold text-muted-foreground underline-offset-4 hover:underline"
           >
-            {s.label}
+            {t("market.clearFilters")}
           </button>
-        ))}
+        )}
+
+        <label className="type-caption ml-auto flex items-center gap-2">
+          {t("market.sort")}:
+          <select
+            value={search.sort ?? "relevance"}
+            onChange={(e) => setSearch({ sort: e.target.value as Sort })}
+            className="border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground outline-none focus:border-primary"
+          >
+            {SORTS.map((s) => (
+              <option key={s} value={s}>
+                {sortLabels[s]}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {list.length === 0 ? (
-        <EmptyState title={t("market.nothing")} subtitle={t("cart.emptySub")} />
+      {products.isPending ? (
+        <ProductGridSkeleton count={12} />
+      ) : products.isError ? (
+        <ErrorState error={products.error} onRetry={() => void products.refetch()} />
+      ) : products.data.items.length === 0 ? (
+        <EmptyState
+          title={t("market.nothing")}
+          subtitle={t("market.nothingSub")}
+          action={
+            hasFilters ? (
+              <button
+                type="button"
+                onClick={() => void navigate({ search: {} })}
+                className="bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+              >
+                {t("market.clearFilters")}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {list.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <>
+          <div
+            className={cn(
+              "grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-8",
+              products.isFetching && "opacity-60 transition-opacity",
+            )}
+          >
+            {products.data.items.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+
+          {products.data.pages > 1 && (
+            <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Sahifalar">
+              {Array.from({ length: products.data.pages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => void navigate({ search: (prev) => ({ ...prev, page: n }) })}
+                  aria-current={n === products.data.page ? "page" : undefined}
+                  className={cn(
+                    "min-w-10 border px-3 py-2 text-sm font-semibold transition-colors",
+                    n === products.data.page
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-card hover:border-border-strong",
+                  )}
+                >
+                  {n}
+                </button>
+              ))}
+            </nav>
+          )}
+        </>
       )}
     </Page>
   );

@@ -1,33 +1,40 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  Outlet,
+  HeadContent,
   Link,
+  Outlet,
+  Scripts,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
-  Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { LangProvider } from "@/lib/i18n";
-import { StoreProvider } from "@/lib/store";
-import { TopBar, BottomNav } from "@/components/motora/Chrome";
+import { BottomNav, TopBar } from "@/components/avtoqism/Chrome";
 import { Toaster } from "@/components/ui/sonner";
+import { LangProvider } from "@/lib/i18n";
+import { UiStateProvider } from "@/lib/store";
+
+/** The feed is a full-bleed dark surface: it renders its own chrome. */
+const CHROMELESS_ROUTES = ["/feed"];
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-5">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Sahifa topilmadi</h2>
-        <div className="mt-6">
+        <p className="type-label text-primary">404</p>
+        <h1 className="type-h1 mt-3">Sahifa topilmadi</h1>
+        <p className="type-caption mt-3">
+          Siz qidirgan sahifa o'chirilgan yoki manzil noto'g'ri kiritilgan bo'lishi mumkin.
+        </p>
+        <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
-            Bosh sahifa
+            Bosh sahifaga qaytish
           </Link>
         </div>
       </div>
@@ -36,31 +43,31 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
   const router = useRouter();
   useEffect(() => {
+    console.error(error);
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-5">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Sahifa yuklanmadi
-        </h1>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <h1 className="type-h2">Sahifa yuklanmadi</h1>
+        <p className="type-caption mt-3">Vaqtinchalik nosozlik yuz berdi. Qayta urinib ko'ring.</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
+            type="button"
             onClick={() => {
-              router.invalidate();
+              void router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Qayta urinish
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="border border-border-strong bg-card px-5 py-3 text-sm font-semibold transition-colors hover:bg-muted"
           >
             Bosh sahifa
           </a>
@@ -75,12 +82,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MOTORA — Avto ehtiyot qismlar marketplace" },
+      { title: "AVTOQISM — Avtomobilingiz uchun aniq tanlov" },
       {
         name: "description",
-        content: "Mashinangizga mos ehtiyot qismlar, ishonchli sotuvchilar va avto lenta.",
+        content:
+          "Garajingizga mashinangizni qo'shing va faqat mos keladigan ehtiyot qismlarni ko'ring. Toshkentdagi ishonchli sotuvchilar, tekshirilgan moslik, tez yetkazib berish.",
       },
+      { name: "theme-color", content: "#faf8f5" },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "AVTOQISM" },
+      { property: "og:locale", content: "uz_UZ" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -89,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -114,22 +125,41 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AppChrome() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const chromeless = CHROMELESS_ROUTES.some((p) => pathname.startsWith(p));
+
+  if (chromeless) {
+    return <Outlet />;
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+      >
+        Asosiy qismga o'tish
+      </a>
+      <TopBar />
+      <main id="main" className="flex-1 pb-24 lg:pb-12">
+        <Outlet />
+      </main>
+      <BottomNav />
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
       <LangProvider>
-        <StoreProvider>
-          <div className="flex min-h-screen flex-col bg-background">
-            <TopBar />
-            <main className="flex-1 pb-24 lg:pb-12">
-              <Outlet />
-            </main>
-            <BottomNav />
-          </div>
+        <UiStateProvider>
+          <AppChrome />
           <Toaster position="top-center" />
-        </StoreProvider>
+        </UiStateProvider>
       </LangProvider>
     </QueryClientProvider>
   );
