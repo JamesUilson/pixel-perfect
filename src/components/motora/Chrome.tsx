@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useLang, useT } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
@@ -193,7 +193,7 @@ export function SectionHead({
 }: {
   title: string;
   subtitle?: string;
-  action?: ReactNodeLike;
+  action?: ReactNode;
 }) {
   return (
     <div className="mb-4 flex items-end justify-between gap-4">
@@ -205,5 +205,3 @@ export function SectionHead({
     </div>
   );
 }
-
-type ReactNodeLike = React.ReactNode;
