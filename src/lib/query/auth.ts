@@ -1,15 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError, api, cartToken, safeApi, tokens } from "@/lib/api/client";
+import { useIsAuthenticated } from "./session";
 import type { AuthResult, CartOut, UserOut } from "@/lib/api/types";
 import { qk } from "./keys";
 
 export function useMe() {
+  const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.me,
     queryFn: () => safeApi<UserOut>("/auth/me"),
     // No token means no request: an anonymous visitor is a normal state, not an error.
-    enabled: tokens.isAuthenticated(),
+    enabled: signedIn,
     retry: (count, error) =>
       error instanceof ApiError && error.status === 401 ? false : count < 2,
     staleTime: 5 * 60_000,

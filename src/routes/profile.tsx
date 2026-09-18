@@ -4,7 +4,7 @@ import { CarFront, Globe, LogOut, Receipt, ShoppingBag } from "lucide-react";
 import { Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
-import { tokens } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { formatPhone } from "@/lib/format";
 import { useLang, useT } from "@/lib/i18n";
 import { useLogout, useMe } from "@/lib/query/auth";
@@ -24,8 +24,9 @@ function Profile() {
   const me = useMe();
   const logout = useLogout();
   const { activeVehicle } = useActiveVehicle();
+  const signedIn = useIsAuthenticated();
 
-  if (!tokens.isAuthenticated()) return <SignInRequired />;
+  if (!signedIn) return <SignInRequired />;
 
   if (me.isError) {
     return (

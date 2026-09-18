@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { EmptyState, Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
-import { ApiError, tokens } from "@/lib/api/client";
+import { ApiError } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import type { DeliveryMethod, PaymentMethod } from "@/lib/api/types";
 import { formatSom } from "@/lib/format";
 import { useT } from "@/lib/i18n";
@@ -32,6 +33,7 @@ function Checkout() {
   const cart = useCart();
   const me = useMe();
   const checkout = useCheckout();
+  const signedIn = useIsAuthenticated();
 
   const [form, setForm] = useState({
     recipient_name: "",
@@ -46,7 +48,7 @@ function Checkout() {
   const [delivery, setDelivery] = useState<DeliveryMethod>("COURIER_PARTNER");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  if (!tokens.isAuthenticated()) return <SignInRequired />;
+  if (!signedIn) return <SignInRequired />;
 
   const set = (field: keyof typeof form) => (value: string) => {
     setForm((f) => ({ ...f, [field]: value }));

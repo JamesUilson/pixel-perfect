@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { safeApi, tokens } from "@/lib/api/client";
+import { safeApi } from "@/lib/api/client";
+import { useIsAuthenticated } from "./session";
 import type { CartOut, CheckoutIn, OrderOut } from "@/lib/api/types";
 import { qk } from "./keys";
 
@@ -40,18 +41,20 @@ export function useRemoveCartItem() {
 }
 
 export function useOrders() {
+  const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.orders,
     queryFn: () => safeApi<OrderOut[]>("/orders"),
-    enabled: tokens.isAuthenticated(),
+    enabled: signedIn,
   });
 }
 
 export function useOrder(orderId: string) {
+  const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.order(orderId),
     queryFn: () => safeApi<OrderOut>(`/orders/${orderId}`),
-    enabled: tokens.isAuthenticated() && Boolean(orderId),
+    enabled: signedIn && Boolean(orderId),
   });
 }
 

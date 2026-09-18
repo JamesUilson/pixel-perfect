@@ -1,14 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { safeApi, tokens } from "@/lib/api/client";
+import { safeApi } from "@/lib/api/client";
+import { useIsAuthenticated } from "./session";
 import type { BrandOut, GarageVehicleOut, ModelOut, VariantOut } from "@/lib/api/types";
 import { qk } from "./keys";
 
 export function useGarage() {
+  const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.garage,
     queryFn: () => safeApi<GarageVehicleOut[]>("/garage/vehicles"),
-    enabled: tokens.isAuthenticated(),
+    enabled: signedIn,
     staleTime: 60_000,
   });
 }

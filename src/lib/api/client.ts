@@ -58,16 +58,30 @@ const store = {
   },
 };
 
+/** Notified when the stored tokens change, so `useIsAuthenticated` can re-read. */
+const sessionListeners = new Set<() => void>();
+
+export function onSessionChange(listener: () => void): () => void {
+  sessionListeners.add(listener);
+  return () => sessionListeners.delete(listener);
+}
+
+function announce() {
+  sessionListeners.forEach((l) => l());
+}
+
 export const tokens = {
   access: () => store.get(ACCESS_KEY),
   refresh: () => store.get(REFRESH_KEY),
   set(pair: { access_token: string; refresh_token: string }) {
     store.set(ACCESS_KEY, pair.access_token);
     store.set(REFRESH_KEY, pair.refresh_token);
+    announce();
   },
   clear() {
     store.set(ACCESS_KEY, null);
     store.set(REFRESH_KEY, null);
+    announce();
   },
   isAuthenticated: () => store.get(ACCESS_KEY) !== null,
 };

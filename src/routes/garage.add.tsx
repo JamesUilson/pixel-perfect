@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
-import { ApiError, tokens } from "@/lib/api/client";
+import { ApiError } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { useT } from "@/lib/i18n";
 import {
   useAddVehicle,
@@ -90,8 +91,9 @@ function AddVehicle() {
   const years = useVehicleYears(modelId);
   const variants = useVehicleVariants(modelId, year);
   const addVehicle = useAddVehicle();
+  const signedIn = useIsAuthenticated();
 
-  if (!tokens.isAuthenticated()) return <SignInRequired />;
+  if (!signedIn) return <SignInRequired />;
 
   const submit = () => {
     if (!variantId || !year) return;

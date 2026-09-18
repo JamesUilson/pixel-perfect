@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { EmptyState, Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
-import { tokens } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { formatDate, formatSom } from "@/lib/format";
 import { useLang, useT } from "@/lib/i18n";
 import { useOrders } from "@/lib/query/commerce";
@@ -21,8 +21,9 @@ function Orders() {
   const t = useT();
   const { lang } = useLang();
   const orders = useOrders();
+  const signedIn = useIsAuthenticated();
 
-  if (!tokens.isAuthenticated()) return <SignInRequired />;
+  if (!signedIn) return <SignInRequired />;
 
   return (
     <Page>

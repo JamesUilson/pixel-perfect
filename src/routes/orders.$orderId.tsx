@@ -6,7 +6,7 @@ import { OrderStatusPill } from "@/components/avtoqism/OrderStatusPill";
 import { Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
-import { tokens } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { formatDateTime, formatPhone, formatSom } from "@/lib/format";
 import { useLang, useT } from "@/lib/i18n";
 import { useCancelOrder, useOrder } from "@/lib/query/commerce";
@@ -26,8 +26,9 @@ function OrderDetail() {
   const { lang } = useLang();
   const order = useOrder(orderId);
   const cancel = useCancelOrder();
+  const signedIn = useIsAuthenticated();
 
-  if (!tokens.isAuthenticated()) return <SignInRequired />;
+  if (!signedIn) return <SignInRequired />;
 
   if (order.isPending) {
     return (

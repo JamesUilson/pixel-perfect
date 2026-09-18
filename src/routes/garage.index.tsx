@@ -6,7 +6,7 @@ import cobalt from "@/assets/car-cobalt.jpg";
 import { EmptyState, Page, PageTitle, SectionHead } from "@/components/avtoqism/Page";
 import { ProductCard } from "@/components/avtoqism/ProductCard";
 import { ErrorState, ProductGridSkeleton } from "@/components/avtoqism/States";
-import { tokens } from "@/lib/api/client";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { formatKm } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { useProducts } from "@/lib/query/catalog";
@@ -33,13 +33,14 @@ function Garage() {
   const garage = useActiveVehicle();
   const setPrimary = useSetPrimaryVehicle();
   const remove = useRemoveVehicle();
+  const signedIn = useIsAuthenticated();
 
   const compatible = useProducts({
     fits_my_car: garage.variantId ? true : undefined,
     size: 8,
   });
 
-  if (!tokens.isAuthenticated()) {
+  if (!signedIn) {
     return <SignInRequired />;
   }
 
