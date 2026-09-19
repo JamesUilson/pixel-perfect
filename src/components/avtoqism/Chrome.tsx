@@ -1,10 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CarFront,
+  Clapperboard,
   Compass,
-  Heart,
   House,
-  Plus,
   Receipt,
   Search,
   ShoppingBag,
@@ -175,17 +174,14 @@ export function BottomNav() {
   const cart = useCart();
   const itemCount = cart.data?.item_count ?? 0;
 
+  // Five destinations, all the same weight. The feed is the product's
+  // differentiator, so it sits in the middle where the thumb lands — but as a
+  // peer of the others, not as an oversized action button. "Add a car" lives on
+  // the garage screen, which is where someone goes looking for it.
   const items = [
     { to: "/", icon: House, label: t("nav.home"), exact: true, badge: 0 },
     { to: "/marketplace", icon: Compass, label: t("nav.market"), exact: false, badge: 0 },
-    {
-      to: "/garage/add",
-      icon: Plus,
-      label: t("nav.create"),
-      exact: false,
-      primary: true,
-      badge: 0,
-    },
+    { to: "/feed", icon: Clapperboard, label: t("nav.feed"), exact: false, badge: 0 },
     { to: "/cart", icon: ShoppingBag, label: t("nav.cart"), exact: false, badge: itemCount },
     { to: "/profile", icon: UserRound, label: t("nav.profile"), exact: false, badge: 0 },
   ] as const;
@@ -198,20 +194,6 @@ export function BottomNav() {
       <div className="grid grid-cols-5">
         {items.map((item) => {
           const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
-          if ("primary" in item && item.primary) {
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="flex items-center justify-center py-2"
-                aria-label={item.label}
-              >
-                <span className="grid size-11 place-items-center bg-primary">
-                  <item.icon className="size-5 text-primary-foreground" strokeWidth={2.6} />
-                </span>
-              </Link>
-            );
-          }
           return (
             <Link
               key={item.to}

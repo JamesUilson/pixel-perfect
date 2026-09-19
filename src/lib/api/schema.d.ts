@@ -502,7 +502,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Savat */
+    /**
+     * Savat
+     * @description A wrong or expired code is not an error here: the cart still prices, and
+     *     ``promo_code_error`` explains what happened next to the field.
+     */
     get: operations["view_cart_api_v1_cart_get"];
     put?: never;
     post?: never;
@@ -870,6 +874,1049 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/seller/{seller_id}/inventory/warehouses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Omborlar */
+    get: operations["list_warehouses_api_v1_seller__seller_id__inventory_warehouses_get"];
+    put?: never;
+    /** Ombor qo'shish */
+    post: operations["create_warehouse_api_v1_seller__seller_id__inventory_warehouses_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/warehouses/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Omborlar bo'yicha qoldiq va qiymat */
+    get: operations["warehouse_summary_api_v1_seller__seller_id__inventory_warehouses_summary_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/warehouses/{warehouse_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Omborni tahrirlash */
+    patch: operations["update_warehouse_api_v1_seller__seller_id__inventory_warehouses__warehouse_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/warehouses/{warehouse_id}/default": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Asosiy ombor qilish */
+    post: operations["make_default_api_v1_seller__seller_id__inventory_warehouses__warehouse_id__default_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/stock": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Qoldiqlar */
+    get: operations["stock_api_v1_seller__seller_id__inventory_stock_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/stock/low": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Tugab qolganlar */
+    get: operations["low_stock_api_v1_seller__seller_id__inventory_stock_low_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/stock/adjust": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Qoldiqni o'zgartirish */
+    post: operations["adjust_stock_api_v1_seller__seller_id__inventory_stock_adjust_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/stock/transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Omborlar aro ko'chirish */
+    post: operations["transfer_stock_api_v1_seller__seller_id__inventory_stock_transfer_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/stock/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Ogohlantirish va joylashuv */
+    post: operations["stock_settings_api_v1_seller__seller_id__inventory_stock_settings_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/inventory/movements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Harakatlar tarixi */
+    get: operations["movements_api_v1_seller__seller_id__inventory_movements_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Hisob holati */
+    get: operations["balance_api_v1_seller__seller_id__finance_balance_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/ledger": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Pul harakati */
+    get: operations["ledger_api_v1_seller__seller_id__finance_ledger_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/payouts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Yechib olishlar */
+    get: operations["payouts_api_v1_seller__seller_id__finance_payouts_get"];
+    put?: never;
+    /** Pul yechishni so'rash */
+    post: operations["request_payout_api_v1_seller__seller_id__finance_payouts_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Hisoblar bo'yicha jami */
+    get: operations["seller_totals_api_v1_seller__seller_id__finance_summary_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Platforma balansi */
+    get: operations["platform_totals_api_v1_admin_finance_summary_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/ledger": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Butun daftar */
+    get: operations["admin_ledger_api_v1_admin_finance_ledger_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/integrity": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Muvozanatsiz yozuvlar
+     * @description Should always return an empty list. The point of the screen is that
+     *     nobody has to take that on faith.
+     */
+    get: operations["integrity_api_v1_admin_finance_integrity_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/payouts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Barcha so'rovlar */
+    get: operations["admin_payouts_api_v1_admin_finance_payouts_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/payouts/{payout_id}/decision": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** So'rovni hal qilish */
+    post: operations["decide_payout_api_v1_admin_finance_payouts__payout_id__decision_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/commission-rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Komissiya qoidalari */
+    get: operations["commission_rules_api_v1_admin_finance_commission_rules_get"];
+    put?: never;
+    /** Qoida qo'shish */
+    post: operations["create_commission_rule_api_v1_admin_finance_commission_rules_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/finance/commission-rules/{rule_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Qoidani o'chirish */
+    delete: operations["deactivate_commission_rule_api_v1_admin_finance_commission_rules__rule_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ads/slots/{slot}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Slot uchun reklamalar */
+    get: operations["slot_content_api_v1_ads_slots__slot__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ads/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Ko'rish yoki bosishni qayd etish
+     * @description Fire-and-forget from the client's point of view.
+     *
+     *     A duplicate inside the dedupe window is silently ignored rather than
+     *     rejected, because a page that refreshes is not a client error.
+     */
+    post: operations["record_event_api_v1_ads_events_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ads/placements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Sotuvdagi o'rinlar */
+    get: operations["placements_api_v1_ads_placements_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/campaigns": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kampaniyalar */
+    get: operations["seller_campaigns_api_v1_seller__seller_id__ads_campaigns_get"];
+    put?: never;
+    /** Kampaniya yaratish */
+    post: operations["create_campaign_api_v1_seller__seller_id__ads_campaigns_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/campaigns/{campaign_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kampaniya */
+    get: operations["campaign_detail_api_v1_seller__seller_id__ads_campaigns__campaign_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Kampaniyani tahrirlash */
+    patch: operations["update_campaign_api_v1_seller__seller_id__ads_campaigns__campaign_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/campaigns/{campaign_id}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Holatni o'zgartirish */
+    post: operations["set_campaign_status_api_v1_seller__seller_id__ads_campaigns__campaign_id__status_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/campaigns/{campaign_id}/daily": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kunlik statistika */
+    get: operations["campaign_daily_api_v1_seller__seller_id__ads_campaigns__campaign_id__daily_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/campaigns/{campaign_id}/creatives": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Banner qo'shish */
+    post: operations["add_creative_api_v1_seller__seller_id__ads_campaigns__campaign_id__creatives_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/ads/creatives/{creative_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Bannerni o'chirish */
+    delete: operations["delete_creative_api_v1_seller__seller_id__ads_creatives__creative_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/campaigns": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Barcha kampaniyalar */
+    get: operations["admin_campaigns_api_v1_admin_ads_campaigns_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/campaigns/{campaign_id}/moderate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Moderatsiya */
+    post: operations["moderate_campaign_api_v1_admin_ads_campaigns__campaign_id__moderate_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/placements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** O'rinlar narxi */
+    get: operations["admin_placements_api_v1_admin_ads_placements_get"];
+    /** O'rin narxini belgilash */
+    put: operations["upsert_placement_api_v1_admin_ads_placements_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/banners": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Bannerlar */
+    get: operations["admin_banners_api_v1_admin_ads_banners_get"];
+    put?: never;
+    /** Banner qo'shish */
+    post: operations["create_banner_api_v1_admin_ads_banners_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/banners/{banner_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Bannerni o'chirish */
+    delete: operations["delete_banner_api_v1_admin_ads_banners__banner_id__delete"];
+    options?: never;
+    head?: never;
+    /** Bannerni tahrirlash */
+    patch: operations["update_banner_api_v1_admin_ads_banners__banner_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/admin/ads/revenue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Reklama daromadi */
+    get: operations["ad_revenue_api_v1_admin_ads_revenue_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/promotions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Aksiyalar */
+    get: operations["list_promotions_api_v1_seller__seller_id__promotions_get"];
+    put?: never;
+    /** Aksiya e'lon qilish */
+    post: operations["create_promotion_api_v1_seller__seller_id__promotions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/promotions/{promotion_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Aksiya */
+    get: operations["promotion_detail_api_v1_seller__seller_id__promotions__promotion_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Aksiyani tahrirlash */
+    patch: operations["update_promotion_api_v1_seller__seller_id__promotions__promotion_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/promotions/{promotion_id}/pause": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** To'xtatish */
+    post: operations["pause_promotion_api_v1_seller__seller_id__promotions__promotion_id__pause_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/promotions/{promotion_id}/resume": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Davom ettirish */
+    post: operations["resume_promotion_api_v1_seller__seller_id__promotions__promotion_id__resume_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/promotions/{promotion_id}/redemptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kim foydalandi */
+    get: operations["redemptions_api_v1_seller__seller_id__promotions__promotion_id__redemptions_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/promotions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Barcha aksiyalar */
+    get: operations["admin_promotions_api_v1_admin_promotions_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Do'kon ko'rsatkichlari */
+    get: operations["seller_overview_api_v1_seller__seller_id__analytics_overview_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/sales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kunlik savdo */
+    get: operations["seller_sales_api_v1_seller__seller_id__analytics_sales_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/orders-by-status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Buyurtmalar holati */
+    get: operations["seller_orders_by_status_api_v1_seller__seller_id__analytics_orders_by_status_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/top-products": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Eng ko'p sotilganlar */
+    get: operations["seller_top_products_api_v1_seller__seller_id__analytics_top_products_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/money-flow": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Pul aylanmasi */
+    get: operations["seller_money_flow_api_v1_seller__seller_id__analytics_money_flow_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/stock": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Omborlar bo'yicha qoldiq */
+    get: operations["seller_stock_api_v1_seller__seller_id__analytics_stock_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/analytics/categories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kategoriyalar ulushi */
+    get: operations["seller_categories_api_v1_seller__seller_id__analytics_categories_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Platforma ko'rsatkichlari */
+    get: operations["platform_overview_api_v1_admin_analytics_overview_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/gmv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kunlik aylanma va daromad */
+    get: operations["platform_gmv_api_v1_admin_analytics_gmv_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/top-sellers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Eng yaxshi sotuvchilar */
+    get: operations["platform_top_sellers_api_v1_admin_analytics_top_sellers_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/orders-by-status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Buyurtmalar holati */
+    get: operations["platform_orders_by_status_api_v1_admin_analytics_orders_by_status_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/categories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kategoriyalar ulushi */
+    get: operations["platform_categories_api_v1_admin_analytics_categories_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Foydalanuvchilar o'sishi */
+    get: operations["platform_users_api_v1_admin_analytics_users_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/ads": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Reklama ko'rsatkichlari */
+    get: operations["platform_ads_api_v1_admin_analytics_ads_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/analytics/inventory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Ombor holati */
+    get: operations["platform_inventory_api_v1_admin_analytics_inventory_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/export/seller/{seller_id}/{report}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Do'kon hisobotini yuklab olish
+     * @description ``report=all`` returns every sheet in one workbook.
+     */
+    get: operations["seller_report_api_v1_export_seller__seller_id___report__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/export/admin/{report}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Platforma hisobotini yuklab olish */
+    get: operations["admin_report_api_v1_export_admin__report__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/export/me/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Xaridlarim tarixini yuklab olish */
+    get: operations["my_orders_api_v1_export_me_orders_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/health": {
     parameters: {
       query?: never;
@@ -908,6 +1955,49 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AccountTotalOut */
+    AccountTotalOut: {
+      account: components["schemas"]["LedgerAccount"];
+      /** Total */
+      total: string;
+    };
+    /**
+     * AdCampaignStatus
+     * @enum {string}
+     */
+    AdCampaignStatus:
+      "DRAFT" | "PENDING_REVIEW" | "ACTIVE" | "PAUSED" | "REJECTED" | "OUT_OF_BUDGET" | "COMPLETED";
+    /** AdEventIn */
+    AdEventIn: {
+      kind: components["schemas"]["AdEventKind"];
+      /** Campaign Id */
+      campaign_id?: string | null;
+      /** Banner Id */
+      banner_id?: string | null;
+      /** Creative Id */
+      creative_id?: string | null;
+    };
+    /**
+     * AdEventKind
+     * @enum {string}
+     */
+    AdEventKind: "IMPRESSION" | "CLICK";
+    /**
+     * AdPricingModel
+     * @enum {string}
+     */
+    AdPricingModel: "CPM" | "CPC" | "FLAT";
+    /**
+     * AdSlot
+     * @enum {string}
+     */
+    AdSlot:
+      | "HOME_SLIDER"
+      | "HOME_BANNER"
+      | "CATEGORY_TOP"
+      | "SEARCH_TOP"
+      | "PRODUCT_RELATED"
+      | "FEED_INTERSTITIAL";
     /** AddressIn */
     AddressIn: {
       /** Recipient Name */
@@ -923,10 +2013,141 @@ export interface components {
       /** Landmark */
       landmark?: string | null;
     };
+    /** AppliedPromotionOut */
+    AppliedPromotionOut: {
+      /**
+       * Promotion Id
+       * Format: uuid
+       */
+      promotion_id: string;
+      /** Title */
+      title: string;
+      /** Kind */
+      kind: string;
+      /** Code */
+      code?: string | null;
+      /**
+       * Seller Id
+       * Format: uuid
+       */
+      seller_id: string;
+      /** Amount */
+      amount: string;
+    };
     /** AuthResult */
     AuthResult: {
       user: components["schemas"]["UserOut"];
       tokens: components["schemas"]["TokenPair"];
+    };
+    /** BalanceOut */
+    BalanceOut: {
+      /**
+       * Seller Id
+       * Format: uuid
+       */
+      seller_id: string;
+      /** Currency */
+      currency: string;
+      /** Pending */
+      pending: string;
+      /** Available */
+      available: string;
+      /** Reserved */
+      reserved: string;
+      /** Lifetime Earned */
+      lifetime_earned: string;
+      /** Lifetime Commission */
+      lifetime_commission: string;
+      /** Lifetime Paid Out */
+      lifetime_paid_out: string;
+      /** Updated At */
+      updated_at?: string | null;
+    };
+    /** BannerIn */
+    BannerIn: {
+      slot: components["schemas"]["AdSlot"];
+      /** Image Url */
+      image_url: string;
+      /** Headline Uz */
+      headline_uz: string;
+      /** Headline Ru */
+      headline_ru?: string | null;
+      /** Subtitle Uz */
+      subtitle_uz?: string | null;
+      /** Cta Uz */
+      cta_uz?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /**
+       * Sort Order
+       * @default 0
+       */
+      sort_order: number;
+      /**
+       * Is Active
+       * @default true
+       */
+      is_active: boolean;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Ends At */
+      ends_at?: string | null;
+    };
+    /** BannerOut */
+    BannerOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      slot: components["schemas"]["AdSlot"];
+      /** Image Url */
+      image_url: string;
+      /** Headline Uz */
+      headline_uz: string;
+      /** Headline Ru */
+      headline_ru?: string | null;
+      /** Subtitle Uz */
+      subtitle_uz?: string | null;
+      /** Cta Uz */
+      cta_uz?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /** Sort Order */
+      sort_order: number;
+      /** Is Active */
+      is_active: boolean;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Ends At */
+      ends_at?: string | null;
+      /** Impressions */
+      impressions: number;
+      /** Clicks */
+      clicks: number;
+    };
+    /** BannerUpdateIn */
+    BannerUpdateIn: {
+      /** Image Url */
+      image_url?: string | null;
+      /** Headline Uz */
+      headline_uz?: string | null;
+      /** Headline Ru */
+      headline_ru?: string | null;
+      /** Subtitle Uz */
+      subtitle_uz?: string | null;
+      /** Cta Uz */
+      cta_uz?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /** Sort Order */
+      sort_order?: number | null;
+      /** Is Active */
+      is_active?: boolean | null;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Ends At */
+      ends_at?: string | null;
     };
     /**
      * BodyType
@@ -951,6 +2172,138 @@ export interface components {
        * @default false
        */
       is_popular: boolean;
+    };
+    /** CampaignDayOut */
+    CampaignDayOut: {
+      /**
+       * Day
+       * Format: date-time
+       */
+      day: string;
+      /** Impressions */
+      impressions: number;
+      /** Clicks */
+      clicks: number;
+      /** Spend */
+      spend: string;
+    };
+    /** CampaignIn */
+    CampaignIn: {
+      /**
+       * Placement Id
+       * Format: uuid
+       */
+      placement_id: string;
+      /** Title */
+      title: string;
+      /** Budget */
+      budget: number | string;
+      /**
+       * Starts At
+       * Format: date-time
+       */
+      starts_at: string;
+      /**
+       * Ends At
+       * Format: date-time
+       */
+      ends_at: string;
+      /** Daily Cap */
+      daily_cap?: number | string | null;
+      /** Target Category Id */
+      target_category_id?: string | null;
+      /** Target Model Id */
+      target_model_id?: string | null;
+      /** Target Region */
+      target_region?: string | null;
+    };
+    /** CampaignOut */
+    CampaignOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Seller Id
+       * Format: uuid
+       */
+      seller_id: string;
+      /**
+       * Placement Id
+       * Format: uuid
+       */
+      placement_id: string;
+      /** Title */
+      title: string;
+      status: components["schemas"]["AdCampaignStatus"];
+      /** Budget */
+      budget: string;
+      /** Spent */
+      spent: string;
+      /** Daily Cap */
+      daily_cap?: string | null;
+      /**
+       * Starts At
+       * Format: date-time
+       */
+      starts_at: string;
+      /**
+       * Ends At
+       * Format: date-time
+       */
+      ends_at: string;
+      /** Target Category Id */
+      target_category_id?: string | null;
+      /** Target Model Id */
+      target_model_id?: string | null;
+      /** Target Region */
+      target_region?: string | null;
+      /** Impressions */
+      impressions: number;
+      /** Clicks */
+      clicks: number;
+      /** Attributed Orders */
+      attributed_orders: number;
+      /** Attributed Revenue */
+      attributed_revenue: string;
+      /** Rejection Reason */
+      rejection_reason?: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Creatives
+       * @default []
+       */
+      creatives: components["schemas"]["CreativeOut"][];
+    };
+    /** CampaignStatusIn */
+    CampaignStatusIn: {
+      status: components["schemas"]["AdCampaignStatus"];
+      /** Reason */
+      reason?: string | null;
+    };
+    /** CampaignUpdateIn */
+    CampaignUpdateIn: {
+      /** Title */
+      title?: string | null;
+      /** Budget */
+      budget?: number | string | null;
+      /** Daily Cap */
+      daily_cap?: number | string | null;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Ends At */
+      ends_at?: string | null;
+      /** Target Category Id */
+      target_category_id?: string | null;
+      /** Target Model Id */
+      target_model_id?: string | null;
+      /** Target Region */
+      target_region?: string | null;
     };
     /** CartItemIn */
     CartItemIn: {
@@ -1001,6 +2354,13 @@ export interface components {
       quantity: number;
       /** Line Total */
       line_total: string;
+      /**
+       * Discount
+       * @default 0
+       */
+      discount: string;
+      /** Promotion Title */
+      promotion_title?: string | null;
       /** Available */
       available: number;
       /**
@@ -1040,6 +2400,15 @@ export interface components {
        * @default []
        */
       blocking_issues: string[];
+      /** Promo Code */
+      promo_code?: string | null;
+      /** Promo Code Error */
+      promo_code_error?: string | null;
+      /**
+       * Applied Promotions
+       * @default []
+       */
+      applied_promotions: components["schemas"]["AppliedPromotionOut"][];
     };
     /**
      * CartSellerGroup
@@ -1051,6 +2420,11 @@ export interface components {
       lines: components["schemas"]["CartLineOut"][];
       /** Subtotal */
       subtotal: string;
+      /**
+       * Discount
+       * @default 0
+       */
+      discount: string;
       /** Delivery Fee */
       delivery_fee: string;
       /** Free Delivery Applied */
@@ -1092,9 +2466,68 @@ export interface components {
       delivery_method: components["schemas"]["DeliveryMethod"];
       /** Comment */
       comment?: string | null;
+      /** Promo Code */
+      promo_code?: string | null;
       /** Return Url */
       return_url?: string | null;
     };
+    /** CommissionRuleIn */
+    CommissionRuleIn: {
+      scope: components["schemas"]["CommissionScope"];
+      /** Percent */
+      percent: number | string;
+      /** Category Id */
+      category_id?: string | null;
+      /** Seller Id */
+      seller_id?: string | null;
+      /** Min Fee */
+      min_fee?: number | string | null;
+      /** Max Fee */
+      max_fee?: number | string | null;
+      /** Active From */
+      active_from?: string | null;
+      /** Active To */
+      active_to?: string | null;
+      /** Note */
+      note?: string | null;
+    };
+    /** CommissionRuleOut */
+    CommissionRuleOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      scope: components["schemas"]["CommissionScope"];
+      /** Percent */
+      percent: string;
+      /** Category Id */
+      category_id?: string | null;
+      /** Seller Id */
+      seller_id?: string | null;
+      /** Min Fee */
+      min_fee?: string | null;
+      /** Max Fee */
+      max_fee?: string | null;
+      /** Is Active */
+      is_active: boolean;
+      /** Active From */
+      active_from?: string | null;
+      /** Active To */
+      active_to?: string | null;
+      /** Note */
+      note?: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /**
+     * CommissionScope
+     * @enum {string}
+     */
+    CommissionScope: "GLOBAL" | "CATEGORY" | "SELLER";
     /**
      * CompatSource
      * @description Ordered by trust. See ``SOURCE_PRIORITY``.
@@ -1170,6 +2603,52 @@ export interface components {
      * @enum {string}
      */
     ContactChannel: "PHONE" | "EMAIL";
+    /** CreativeIn */
+    CreativeIn: {
+      /** Image Url */
+      image_url: string;
+      /** Headline Uz */
+      headline_uz: string;
+      /** Headline Ru */
+      headline_ru?: string | null;
+      /** Subtitle Uz */
+      subtitle_uz?: string | null;
+      /** Cta Uz */
+      cta_uz?: string | null;
+      /** Product Id */
+      product_id?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /**
+       * Sort Order
+       * @default 0
+       */
+      sort_order: number;
+    };
+    /** CreativeOut */
+    CreativeOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Image Url */
+      image_url: string;
+      /** Headline Uz */
+      headline_uz: string;
+      /** Headline Ru */
+      headline_ru?: string | null;
+      /** Subtitle Uz */
+      subtitle_uz?: string | null;
+      /** Cta Uz */
+      cta_uz?: string | null;
+      /** Product Id */
+      product_id?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /** Sort Order */
+      sort_order: number;
+    };
     /**
      * DeliveryMethod
      * @enum {string}
@@ -1297,6 +2776,68 @@ export interface components {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
     };
+    /**
+     * LedgerAccount
+     * @description Who the money belongs to at each point in its journey.
+     * @enum {string}
+     */
+    LedgerAccount:
+      | "CUSTOMER"
+      | "ESCROW"
+      | "SELLER_PENDING"
+      | "SELLER_AVAILABLE"
+      | "PLATFORM_COMMISSION"
+      | "PLATFORM_DELIVERY"
+      | "PLATFORM_ADS"
+      | "PAYOUT"
+      | "REFUND";
+    /** LedgerEntryOut */
+    LedgerEntryOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Group Id
+       * Format: uuid
+       */
+      group_id: string;
+      kind: components["schemas"]["LedgerKind"];
+      account: components["schemas"]["LedgerAccount"];
+      /** Amount */
+      amount: string;
+      /** Currency */
+      currency: string;
+      /** Order Id */
+      order_id?: string | null;
+      /** Payout Id */
+      payout_id?: string | null;
+      /** Campaign Id */
+      campaign_id?: string | null;
+      /** Description */
+      description?: string | null;
+    };
+    /**
+     * LedgerKind
+     * @enum {string}
+     */
+    LedgerKind:
+      | "ORDER_CAPTURE"
+      | "COMMISSION"
+      | "SELLER_EARNING"
+      | "EARNING_RELEASE"
+      | "DELIVERY_FEE"
+      | "REFUND"
+      | "PAYOUT"
+      | "AD_CHARGE"
+      | "AD_TOPUP"
+      | "ADJUSTMENT";
     /** LoginIn */
     LoginIn: {
       /** Identifier */
@@ -1334,6 +2875,37 @@ export interface components {
        * @default false
        */
       is_popular: boolean;
+    };
+    /** MovementOut */
+    MovementOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      kind: components["schemas"]["StockMovementKind"];
+      /** Delta */
+      delta: number;
+      /** Balance After */
+      balance_after: number;
+      /**
+       * Warehouse Id
+       * Format: uuid
+       */
+      warehouse_id: string;
+      /** Warehouse Name */
+      warehouse_name: string;
+      /** Product Name */
+      product_name: string;
+      /** Note */
+      note?: string | null;
+      /** Order Item Id */
+      order_item_id?: string | null;
     };
     /** OfferOut */
     OfferOut: {
@@ -1590,6 +3162,116 @@ export interface components {
      * @enum {string}
      */
     PaymentMethod: "CASH_ON_DELIVERY" | "CLICK" | "PAYME" | "UZCARD" | "HUMO" | "CARD" | "SANDBOX";
+    /** PayoutDecisionIn */
+    PayoutDecisionIn: {
+      status: components["schemas"]["PayoutStatus"];
+      /** Note */
+      note?: string | null;
+    };
+    /** PayoutOut */
+    PayoutOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Reference */
+      reference: string;
+      /**
+       * Seller Id
+       * Format: uuid
+       */
+      seller_id: string;
+      /** Amount */
+      amount: string;
+      /** Currency */
+      currency: string;
+      status: components["schemas"]["PayoutStatus"];
+      /** Method */
+      method: string;
+      /** Account Label */
+      account_label?: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Reviewed At */
+      reviewed_at?: string | null;
+      /** Paid At */
+      paid_at?: string | null;
+      /** Note */
+      note?: string | null;
+      /** Failure Reason */
+      failure_reason?: string | null;
+    };
+    /** PayoutRequestIn */
+    PayoutRequestIn: {
+      /** Amount */
+      amount: number | string;
+      /** Account Label */
+      account_label?: string | null;
+    };
+    /**
+     * PayoutStatus
+     * @enum {string}
+     */
+    PayoutStatus: "REQUESTED" | "APPROVED" | "PROCESSING" | "PAID" | "REJECTED" | "FAILED";
+    /** PlacementIn */
+    PlacementIn: {
+      slot: components["schemas"]["AdSlot"];
+      /** Name Uz */
+      name_uz?: string | null;
+      /** Description Uz */
+      description_uz?: string | null;
+      /** Width */
+      width?: number | null;
+      /** Height */
+      height?: number | null;
+      /** Max Active */
+      max_active?: number | null;
+      pricing_model?: components["schemas"]["AdPricingModel"] | null;
+      /** Price Cpm */
+      price_cpm?: number | string | null;
+      /** Price Cpc */
+      price_cpc?: number | string | null;
+      /** Price Flat Daily */
+      price_flat_daily?: number | string | null;
+      /** Min Budget */
+      min_budget?: number | string | null;
+      /** Is Active */
+      is_active?: boolean | null;
+    };
+    /** PlacementOut */
+    PlacementOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      slot: components["schemas"]["AdSlot"];
+      /** Name Uz */
+      name_uz: string;
+      /** Description Uz */
+      description_uz?: string | null;
+      /** Width */
+      width?: number | null;
+      /** Height */
+      height?: number | null;
+      /** Max Active */
+      max_active: number;
+      pricing_model: components["schemas"]["AdPricingModel"];
+      /** Price Cpm */
+      price_cpm?: string | null;
+      /** Price Cpc */
+      price_cpc?: string | null;
+      /** Price Flat Daily */
+      price_flat_daily?: string | null;
+      /** Min Budget */
+      min_budget: string;
+      /** Is Active */
+      is_active: boolean;
+    };
     /**
      * ProductCondition
      * @enum {string}
@@ -1740,6 +3422,165 @@ export interface components {
       /** Warranty Months */
       warranty_months?: number | null;
     };
+    /** PromotionIn */
+    PromotionIn: {
+      /** Title Uz */
+      title_uz: string;
+      kind: components["schemas"]["PromotionKind"];
+      scope: components["schemas"]["PromotionScope"];
+      /**
+       * Value
+       * @default 0
+       */
+      value: number | string;
+      /**
+       * Starts At
+       * Format: date-time
+       */
+      starts_at: string;
+      /**
+       * Ends At
+       * Format: date-time
+       */
+      ends_at: string;
+      /**
+       * Product Ids
+       * @default []
+       */
+      product_ids: string[];
+      /**
+       * Category Ids
+       * @default []
+       */
+      category_ids: string[];
+      /** Code */
+      code?: string | null;
+      /** Max Discount */
+      max_discount?: number | string | null;
+      /** Min Order Amount */
+      min_order_amount?: number | string | null;
+      /** Usage Limit */
+      usage_limit?: number | null;
+      /**
+       * Usage Limit Per User
+       * @default 1
+       */
+      usage_limit_per_user: number | null;
+    };
+    /**
+     * PromotionKind
+     * @enum {string}
+     */
+    PromotionKind: "PERCENT" | "FIXED" | "FREE_DELIVERY";
+    /** PromotionOut */
+    PromotionOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Seller Id
+       * Format: uuid
+       */
+      seller_id: string;
+      /** Title Uz */
+      title_uz: string;
+      kind: components["schemas"]["PromotionKind"];
+      scope: components["schemas"]["PromotionScope"];
+      /** Value */
+      value: string;
+      /** Max Discount */
+      max_discount?: string | null;
+      /** Min Order Amount */
+      min_order_amount?: string | null;
+      /** Code */
+      code?: string | null;
+      /**
+       * Starts At
+       * Format: date-time
+       */
+      starts_at: string;
+      /**
+       * Ends At
+       * Format: date-time
+       */
+      ends_at: string;
+      /** Is Active */
+      is_active: boolean;
+      /** Usage Limit */
+      usage_limit?: number | null;
+      /** Usage Limit Per User */
+      usage_limit_per_user?: number | null;
+      /** Used Count */
+      used_count: number;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Targets
+       * @default []
+       */
+      targets: components["schemas"]["PromotionTargetOut"][];
+    };
+    /**
+     * PromotionScope
+     * @enum {string}
+     */
+    PromotionScope: "PRODUCT" | "CATEGORY" | "SELLER";
+    /** PromotionTargetOut */
+    PromotionTargetOut: {
+      /** Product Id */
+      product_id?: string | null;
+      /** Category Id */
+      category_id?: string | null;
+    };
+    /** PromotionUpdateIn */
+    PromotionUpdateIn: {
+      /** Title Uz */
+      title_uz?: string | null;
+      /** Value */
+      value?: number | string | null;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Ends At */
+      ends_at?: string | null;
+      /** Max Discount */
+      max_discount?: number | string | null;
+      /** Min Order Amount */
+      min_order_amount?: number | string | null;
+      /** Usage Limit */
+      usage_limit?: number | null;
+      /** Usage Limit Per User */
+      usage_limit_per_user?: number | null;
+    };
+    /** RedemptionOut */
+    RedemptionOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Order Id
+       * Format: uuid
+       */
+      order_id: string;
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+      /** Amount */
+      amount: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
     /** RefreshIn */
     RefreshIn: {
       /** Refresh Token */
@@ -1869,6 +3710,36 @@ export interface components {
      */
     SellerVerificationLevel: "BASIC" | "BUSINESS_VERIFIED" | "TRUSTED_SELLER";
     /**
+     * SlideOut
+     * @description What the storefront renders. A slide is either a paid campaign or a
+     *     house banner, and the front end treats both the same — it only reports the
+     *     event back with whichever id it was given.
+     */
+    SlideOut: {
+      /** Kind */
+      kind: string;
+      /** Campaign Id */
+      campaign_id?: string | null;
+      /** Banner Id */
+      banner_id?: string | null;
+      /** Creative Id */
+      creative_id?: string | null;
+      /** Image Url */
+      image_url: string;
+      /** Headline */
+      headline: string;
+      /** Subtitle */
+      subtitle?: string | null;
+      /** Cta */
+      cta?: string | null;
+      /** Link Url */
+      link_url?: string | null;
+      /** Product Id */
+      product_id?: string | null;
+      /** Sponsored */
+      sponsored: boolean;
+    };
+    /**
      * SortOrder
      * @enum {string}
      */
@@ -1885,6 +3756,124 @@ export interface components {
     /** StatusChangeIn */
     StatusChangeIn: {
       status: components["schemas"]["OrderStatus"];
+      /** Note */
+      note?: string | null;
+    };
+    /** StockAdjustIn */
+    StockAdjustIn: {
+      /**
+       * Warehouse Id
+       * Format: uuid
+       */
+      warehouse_id: string;
+      /**
+       * Offer Id
+       * Format: uuid
+       */
+      offer_id: string;
+      kind: components["schemas"]["StockMovementKind"];
+      /** Delta */
+      delta: number;
+      /** Note */
+      note?: string | null;
+      /** Cost Price */
+      cost_price?: number | string | null;
+    };
+    /**
+     * StockMovementKind
+     * @description Every change to a warehouse quantity is one of these. Append-only.
+     * @enum {string}
+     */
+    StockMovementKind:
+      "INBOUND" | "SALE" | "RETURN" | "ADJUSTMENT" | "LOSS" | "TRANSFER_OUT" | "TRANSFER_IN";
+    /**
+     * StockRowOut
+     * @description One product on one shelf.
+     */
+    StockRowOut: {
+      /**
+       * Inventory Item Id
+       * Format: uuid
+       */
+      inventory_item_id: string;
+      /**
+       * Warehouse Id
+       * Format: uuid
+       */
+      warehouse_id: string;
+      /** Warehouse Name */
+      warehouse_name: string;
+      /**
+       * Offer Id
+       * Format: uuid
+       */
+      offer_id: string;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Product Name */
+      product_name: string;
+      /** Product Slug */
+      product_slug: string;
+      /** Oem Number */
+      oem_number?: string | null;
+      /** Price */
+      price: string;
+      /** Quantity */
+      quantity: number;
+      /** Reserved */
+      reserved: number;
+      /** Available */
+      available: number;
+      /** Low Stock Threshold */
+      low_stock_threshold?: number | null;
+      /** Is Low */
+      is_low: boolean;
+      /** Bin Location */
+      bin_location?: string | null;
+      /** Cost Price */
+      cost_price?: string | null;
+    };
+    /** StockSettingsIn */
+    StockSettingsIn: {
+      /**
+       * Warehouse Id
+       * Format: uuid
+       */
+      warehouse_id: string;
+      /**
+       * Offer Id
+       * Format: uuid
+       */
+      offer_id: string;
+      /** Low Stock Threshold */
+      low_stock_threshold?: number | null;
+      /** Bin Location */
+      bin_location?: string | null;
+      /** Cost Price */
+      cost_price?: number | string | null;
+    };
+    /** StockTransferIn */
+    StockTransferIn: {
+      /**
+       * Offer Id
+       * Format: uuid
+       */
+      offer_id: string;
+      /**
+       * From Warehouse Id
+       * Format: uuid
+       */
+      from_warehouse_id: string;
+      /**
+       * To Warehouse Id
+       * Format: uuid
+       */
+      to_warehouse_id: string;
+      /** Quantity */
+      quantity: number;
       /** Note */
       note?: string | null;
     };
@@ -2008,6 +3997,98 @@ export interface components {
        * @default []
        */
       document_urls: string[];
+    };
+    /** WarehouseIn */
+    WarehouseIn: {
+      /** Name */
+      name: string;
+      /** Code */
+      code: string;
+      /** Region */
+      region: string;
+      /** District */
+      district: string;
+      /** Address */
+      address?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /**
+       * Allows Pickup
+       * @default true
+       */
+      allows_pickup: boolean;
+      /**
+       * Make Default
+       * @default false
+       */
+      make_default: boolean;
+    };
+    /** WarehouseOut */
+    WarehouseOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Code */
+      code: string;
+      /** Region */
+      region: string;
+      /** District */
+      district: string;
+      /** Address */
+      address?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Is Default */
+      is_default: boolean;
+      /** Is Active */
+      is_active: boolean;
+      /** Allows Pickup */
+      allows_pickup: boolean;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /**
+     * WarehouseSummaryOut
+     * @description One card on the warehouses screen.
+     */
+    WarehouseSummaryOut: {
+      warehouse: components["schemas"]["WarehouseOut"];
+      /** Sku Count */
+      sku_count: number;
+      /** Units */
+      units: number;
+      /** Reserved */
+      reserved: number;
+      /** Available */
+      available: number;
+      /** Cost Value */
+      cost_value: string;
+      /** Retail Value */
+      retail_value: string;
+    };
+    /** WarehouseUpdateIn */
+    WarehouseUpdateIn: {
+      /** Name */
+      name?: string | null;
+      /** Region */
+      region?: string | null;
+      /** District */
+      district?: string | null;
+      /** Address */
+      address?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Allows Pickup */
+      allows_pickup?: boolean | null;
+      /** Is Active */
+      is_active?: boolean | null;
     };
   };
   responses: never;
@@ -2948,7 +5029,9 @@ export interface operations {
   };
   view_cart_api_v1_cart_get: {
     parameters: {
-      query?: never;
+      query?: {
+        promo_code?: string | null;
+      };
       header?: {
         "x-cart-token"?: string | null;
       };
@@ -3668,6 +5751,2248 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_warehouses_api_v1_seller__seller_id__inventory_warehouses_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WarehouseOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_warehouse_api_v1_seller__seller_id__inventory_warehouses_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WarehouseIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WarehouseOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  warehouse_summary_api_v1_seller__seller_id__inventory_warehouses_summary_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WarehouseSummaryOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_warehouse_api_v1_seller__seller_id__inventory_warehouses__warehouse_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        warehouse_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WarehouseUpdateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WarehouseOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  make_default_api_v1_seller__seller_id__inventory_warehouses__warehouse_id__default_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        warehouse_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WarehouseOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  stock_api_v1_seller__seller_id__inventory_stock_get: {
+    parameters: {
+      query?: {
+        warehouse_id?: string | null;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StockRowOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  low_stock_api_v1_seller__seller_id__inventory_stock_low_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StockRowOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  adjust_stock_api_v1_seller__seller_id__inventory_stock_adjust_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockAdjustIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StockRowOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  transfer_stock_api_v1_seller__seller_id__inventory_stock_transfer_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StockRowOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  stock_settings_api_v1_seller__seller_id__inventory_stock_settings_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockSettingsIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StockRowOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  movements_api_v1_seller__seller_id__inventory_movements_get: {
+    parameters: {
+      query?: {
+        warehouse_id?: string | null;
+        offer_id?: string | null;
+        kind?: components["schemas"]["StockMovementKind"] | null;
+        since?: string | null;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MovementOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  balance_api_v1_seller__seller_id__finance_balance_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BalanceOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  ledger_api_v1_seller__seller_id__finance_ledger_get: {
+    parameters: {
+      query?: {
+        account?: components["schemas"]["LedgerAccount"] | null;
+        kind?: components["schemas"]["LedgerKind"] | null;
+        since?: string | null;
+        until?: string | null;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LedgerEntryOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  payouts_api_v1_seller__seller_id__finance_payouts_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  request_payout_api_v1_seller__seller_id__finance_payouts_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PayoutRequestIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_totals_api_v1_seller__seller_id__finance_summary_get: {
+    parameters: {
+      query?: {
+        since?: string | null;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountTotalOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_totals_api_v1_admin_finance_summary_get: {
+    parameters: {
+      query?: {
+        since?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountTotalOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_ledger_api_v1_admin_finance_ledger_get: {
+    parameters: {
+      query?: {
+        seller_id?: string | null;
+        order_id?: string | null;
+        account?: components["schemas"]["LedgerAccount"] | null;
+        kind?: components["schemas"]["LedgerKind"] | null;
+        since?: string | null;
+        until?: string | null;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LedgerEntryOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  integrity_api_v1_admin_finance_integrity_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+  };
+  admin_payouts_api_v1_admin_finance_payouts_get: {
+    parameters: {
+      query?: {
+        seller_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  decide_payout_api_v1_admin_finance_payouts__payout_id__decision_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        payout_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PayoutDecisionIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  commission_rules_api_v1_admin_finance_commission_rules_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommissionRuleOut"][];
+        };
+      };
+    };
+  };
+  create_commission_rule_api_v1_admin_finance_commission_rules_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CommissionRuleIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommissionRuleOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  deactivate_commission_rule_api_v1_admin_finance_commission_rules__rule_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        rule_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommissionRuleOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  slot_content_api_v1_ads_slots__slot__get: {
+    parameters: {
+      query?: {
+        category_id?: string | null;
+        model_id?: string | null;
+        region?: string | null;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        slot: components["schemas"]["AdSlot"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SlideOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  record_event_api_v1_ads_events_post: {
+    parameters: {
+      query?: {
+        session_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdEventIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  placements_api_v1_ads_placements_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacementOut"][];
+        };
+      };
+    };
+  };
+  seller_campaigns_api_v1_seller__seller_id__ads_campaigns_get: {
+    parameters: {
+      query?: {
+        status?: components["schemas"]["AdCampaignStatus"] | null;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_campaign_api_v1_seller__seller_id__ads_campaigns_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  campaign_detail_api_v1_seller__seller_id__ads_campaigns__campaign_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_campaign_api_v1_seller__seller_id__ads_campaigns__campaign_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignUpdateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  set_campaign_status_api_v1_seller__seller_id__ads_campaigns__campaign_id__status_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignStatusIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  campaign_daily_api_v1_seller__seller_id__ads_campaigns__campaign_id__daily_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignDayOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_creative_api_v1_seller__seller_id__ads_campaigns__campaign_id__creatives_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreativeIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreativeOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_creative_api_v1_seller__seller_id__ads_creatives__creative_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        creative_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_campaigns_api_v1_admin_ads_campaigns_get: {
+    parameters: {
+      query?: {
+        status?: components["schemas"]["AdCampaignStatus"] | null;
+        seller_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  moderate_campaign_api_v1_admin_ads_campaigns__campaign_id__moderate_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        campaign_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignStatusIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CampaignOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_placements_api_v1_admin_ads_placements_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacementOut"][];
+        };
+      };
+    };
+  };
+  upsert_placement_api_v1_admin_ads_placements_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlacementIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacementOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_banners_api_v1_admin_ads_banners_get: {
+    parameters: {
+      query?: {
+        slot?: components["schemas"]["AdSlot"] | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BannerOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_banner_api_v1_admin_ads_banners_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BannerIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BannerOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_banner_api_v1_admin_ads_banners__banner_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        banner_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_banner_api_v1_admin_ads_banners__banner_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        banner_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BannerUpdateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BannerOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  ad_revenue_api_v1_admin_ads_revenue_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_promotions_api_v1_seller__seller_id__promotions_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_promotion_api_v1_seller__seller_id__promotions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PromotionIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  promotion_detail_api_v1_seller__seller_id__promotions__promotion_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        promotion_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_promotion_api_v1_seller__seller_id__promotions__promotion_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        promotion_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PromotionUpdateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  pause_promotion_api_v1_seller__seller_id__promotions__promotion_id__pause_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        promotion_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  resume_promotion_api_v1_seller__seller_id__promotions__promotion_id__resume_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        promotion_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  redemptions_api_v1_seller__seller_id__promotions__promotion_id__redemptions_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        promotion_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RedemptionOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_promotions_api_v1_admin_promotions_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionOut"][];
+        };
+      };
+    };
+  };
+  seller_overview_api_v1_seller__seller_id__analytics_overview_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_sales_api_v1_seller__seller_id__analytics_sales_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_orders_by_status_api_v1_seller__seller_id__analytics_orders_by_status_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_top_products_api_v1_seller__seller_id__analytics_top_products_get: {
+    parameters: {
+      query?: {
+        days?: number;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_money_flow_api_v1_seller__seller_id__analytics_money_flow_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_stock_api_v1_seller__seller_id__analytics_stock_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_categories_api_v1_seller__seller_id__analytics_categories_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_overview_api_v1_admin_analytics_overview_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_gmv_api_v1_admin_analytics_gmv_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_top_sellers_api_v1_admin_analytics_top_sellers_get: {
+    parameters: {
+      query?: {
+        days?: number;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_orders_by_status_api_v1_admin_analytics_orders_by_status_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+    };
+  };
+  platform_categories_api_v1_admin_analytics_categories_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_users_api_v1_admin_analytics_users_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_ads_api_v1_admin_analytics_ads_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          }[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  platform_inventory_api_v1_admin_analytics_inventory_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+  };
+  seller_report_api_v1_export_seller__seller_id___report__get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        seller_id: string;
+        report: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_report_api_v1_export_admin__report__get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        report: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  my_orders_api_v1_export_me_orders_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
         };
       };
     };

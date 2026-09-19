@@ -64,6 +64,16 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
+  /* Chart series. Fixed order, never cycled — see src/lib/viz.ts. */
+  --color-viz-1: var(--viz-1);
+  --color-viz-2: var(--viz-2);
+  --color-viz-3: var(--viz-3);
+  --color-viz-4: var(--viz-4);
+  --color-viz-5: var(--viz-5);
+  --color-viz-6: var(--viz-6);
+  --color-viz-grid: var(--viz-grid);
+  --color-viz-axis: var(--viz-axis);
+
   /* Dark surface used by the social feed, in both themes. */
   --color-feed: var(--feed);
   --color-feed-foreground: var(--feed-foreground);
@@ -116,6 +126,21 @@
   --feed-foreground: oklch(0.98 0.003 80);
   --feed-muted: oklch(0.76 0.008 255);
   --feed-border: oklch(1 0 0 / 18%);
+
+  /*
+   * Chart series, slot 1 first. Validated for colour-vision separation as an
+   * ordered set; re-ordering or adding a seventh breaks that guarantee.
+   * Written as hex rather than oklch because these exact values are what the
+   * validator signed off on.
+   */
+  --viz-1: #da3b21;
+  --viz-2: #2a78d6;
+  --viz-3: #1baf7a;
+  --viz-4: #eda100;
+  --viz-5: #4a3aa7;
+  --viz-6: #e87ba4;
+  --viz-grid: #e6e3de;
+  --viz-axis: #6b6a66;
 }
 
 .dark {
@@ -145,6 +170,16 @@
   --border: oklch(1 0 0 / 12%);
   --border-strong: oklch(1 0 0 / 22%);
   --input: oklch(1 0 0 / 16%);
+
+  /* The same six hues re-stepped for the dark surface, not an inverted flip. */
+  --viz-1: #e85339;
+  --viz-2: #3987e5;
+  --viz-3: #199e70;
+  --viz-4: #c98500;
+  --viz-5: #9085e9;
+  --viz-6: #d55181;
+  --viz-grid: #2b3138;
+  --viz-axis: #a8a8a3;
 }
 
 @layer base {

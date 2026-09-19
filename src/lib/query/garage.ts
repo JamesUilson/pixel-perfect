@@ -66,7 +66,7 @@ function invalidatePersonalised(queryClient: ReturnType<typeof useQueryClient>) 
   void queryClient.invalidateQueries({ queryKey: qk.garage });
   void queryClient.invalidateQueries({ queryKey: ["products"] });
   void queryClient.invalidateQueries({ queryKey: ["product"] });
-  void queryClient.invalidateQueries({ queryKey: qk.cart });
+  void queryClient.invalidateQueries({ queryKey: ["cart"] });
 }
 
 export function useAddVehicle() {

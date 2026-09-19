@@ -27,7 +27,7 @@ async function adoptGuestCart(queryClient: ReturnType<typeof useQueryClient>) {
     /* merging is best effort; never block a successful login on it */
   } finally {
     if (guest) cartToken.set(null);
-    await queryClient.invalidateQueries({ queryKey: qk.cart });
+    await queryClient.invalidateQueries({ queryKey: ["cart"] });
   }
 }
 
