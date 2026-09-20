@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { safeApi } from "@/lib/api/client";
 import type {
   AccountTotalOut,
+  ActiveGatewaysOut,
   AdDay,
   BannerIn,
   BannerOut,
@@ -22,6 +23,9 @@ import type {
   InventoryHealth,
   LedgerEntryOut,
   LedgerIntegrity,
+  PaymentGateway,
+  PaymentSettingIn,
+  PaymentSettingOut,
   PayoutOut,
   PlacementIn,
   PlacementOut,
@@ -200,6 +204,40 @@ export function useDeleteCommissionRule() {
     mutationFn: (ruleId: string) =>
       safeApi<CommissionRuleOut>(`/admin/finance/commission-rules/${ruleId}`, {
         method: "DELETE",
+      }),
+    onSuccess: invalidate,
+  });
+}
+
+/* --- payment gateways -------------------------------------------------------------
+ * A gateway's secret never comes back from the server; the list carries a
+ * masked hint instead, and an empty secret field on save means "keep it".
+ */
+export function usePaymentSettings() {
+  const signedIn = useIsAuthenticated();
+  return useQuery({
+    queryKey: qk.adminPaymentSettings,
+    queryFn: () => safeApi<PaymentSettingOut[]>("/admin/payments/settings"),
+    enabled: signedIn,
+  });
+}
+
+export function useActiveGateways() {
+  const signedIn = useIsAuthenticated();
+  return useQuery({
+    queryKey: qk.adminPaymentActive,
+    queryFn: () => safeApi<ActiveGatewaysOut>("/admin/payments/active"),
+    enabled: signedIn,
+  });
+}
+
+export function useSavePaymentSetting() {
+  const invalidate = useAdminInvalidator();
+  return useMutation({
+    mutationFn: ({ gateway, ...body }: PaymentSettingIn & { gateway: PaymentGateway }) =>
+      safeApi<PaymentSettingOut>(`/admin/payments/settings/${gateway}`, {
+        method: "PUT",
+        body,
       }),
     onSuccess: invalidate,
   });

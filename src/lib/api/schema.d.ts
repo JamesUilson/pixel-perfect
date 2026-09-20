@@ -667,6 +667,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/payments/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** To'lov tizimlari */
+    get: operations["list_settings_api_v1_admin_payments_settings_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/payments/settings/{gateway}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Tizimni sozlash */
+    put: operations["save_setting_api_v1_admin_payments_settings__gateway__put"];
+    post?: never;
+    /** Sozlamani o'chirish */
+    delete: operations["delete_setting_api_v1_admin_payments_settings__gateway__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/payments/active": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Yoqilgan to'lov usullari
+     * @description What a buyer will actually be offered at checkout.
+     */
+    get: operations["active_gateways_api_v1_admin_payments_active_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/seller/{seller_id}/orders": {
     parameters: {
       query?: never;
@@ -1093,6 +1148,99 @@ export interface paths {
     /** Pul yechishni so'rash */
     post: operations["request_payout_api_v1_seller__seller_id__finance_payouts_post"];
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/methods": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Kartalarim */
+    get: operations["payout_methods_api_v1_seller__seller_id__finance_methods_get"];
+    put?: never;
+    /**
+     * Karta qo'shish
+     * @description The card number is read here, handed to the provider and forgotten.
+     *
+     *     What is stored is the provider's token and enough to recognise the card.
+     *     A code goes to the seller's phone; until they enter it the card cannot be
+     *     paid to.
+     */
+    post: operations["add_card_api_v1_seller__seller_id__finance_methods_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/methods/{method_id}/verify": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Kartani tasdiqlash */
+    post: operations["verify_card_api_v1_seller__seller_id__finance_methods__method_id__verify_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/methods/{method_id}/resend": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Kodni qayta yuborish */
+    post: operations["resend_card_code_api_v1_seller__seller_id__finance_methods__method_id__resend_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/methods/{method_id}/default": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Asosiy qilish */
+    post: operations["make_default_card_api_v1_seller__seller_id__finance_methods__method_id__default_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/seller/{seller_id}/finance/methods/{method_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Kartani o'chirish */
+    delete: operations["revoke_card_api_v1_seller__seller_id__finance_methods__method_id__delete"];
     options?: never;
     head?: never;
     patch?: never;
@@ -2306,6 +2454,40 @@ export interface components {
       /** Target Region */
       target_region?: string | null;
     };
+    /** CardAddedOut */
+    CardAddedOut: {
+      method: components["schemas"]["PayoutMethodOut"];
+      /** Dev Code */
+      dev_code?: string | null;
+    };
+    /**
+     * CardBrand
+     * @enum {string}
+     */
+    CardBrand: "UZCARD" | "HUMO" | "VISA" | "MASTERCARD" | "UNKNOWN";
+    /**
+     * CardIn
+     * @description A card on its way to the tokenizer.
+     *
+     *     ``number`` is the only place a card number appears in this codebase. It is
+     *     read once, handed to the provider and never stored, never logged and never
+     *     echoed back.
+     */
+    CardIn: {
+      /** Number */
+      number: string;
+      /** Expires Month */
+      expires_month?: number | null;
+      /** Expires Year */
+      expires_year?: number | null;
+      /** Holder Name */
+      holder_name?: string | null;
+      /**
+       * Make Default
+       * @default false
+       */
+      make_default: boolean;
+    };
     /** CartItemIn */
     CartItemIn: {
       /**
@@ -2791,7 +2973,8 @@ export interface components {
       | "PLATFORM_DELIVERY"
       | "PLATFORM_ADS"
       | "PAYOUT"
-      | "REFUND";
+      | "REFUND"
+      | "WALLET";
     /** LedgerEntryOut */
     LedgerEntryOut: {
       /**
@@ -2837,6 +3020,8 @@ export interface components {
       | "REFUND"
       | "PAYOUT"
       | "AD_CHARGE"
+      | "WALLET_TOPUP"
+      | "WALLET_SPEND"
       | "AD_TOPUP"
       | "ADJUSTMENT";
     /** LoginIn */
@@ -3159,16 +3344,140 @@ export interface components {
       new_password: string;
     };
     /**
+     * PaymentGateway
+     * @description A gateway an administrator can configure from the panel.
+     * @enum {string}
+     */
+    PaymentGateway: "CLICK" | "PAYME" | "UZUM_BANK" | "SANDBOX";
+    /**
      * PaymentMethod
      * @enum {string}
      */
     PaymentMethod: "CASH_ON_DELIVERY" | "CLICK" | "PAYME" | "UZCARD" | "HUMO" | "CARD" | "SANDBOX";
+    /** PaymentSettingIn */
+    PaymentSettingIn: {
+      /** Merchant Id */
+      merchant_id?: string | null;
+      /** Service Id */
+      service_id?: string | null;
+      /** Secret Key */
+      secret_key?: string | null;
+      /** Callback Secret */
+      callback_secret?: string | null;
+      /** Is Live */
+      is_live?: boolean | null;
+      /** Is Active */
+      is_active?: boolean | null;
+      /** Return Url */
+      return_url?: string | null;
+      /** Note */
+      note?: string | null;
+    };
+    /** PaymentSettingOut */
+    PaymentSettingOut: {
+      gateway: components["schemas"]["PaymentGateway"];
+      /** Merchant Id */
+      merchant_id?: string | null;
+      /** Service Id */
+      service_id?: string | null;
+      /**
+       * Is Live
+       * @default false
+       */
+      is_live: boolean;
+      /**
+       * Is Active
+       * @default false
+       */
+      is_active: boolean;
+      /** Return Url */
+      return_url?: string | null;
+      /** Note */
+      note?: string | null;
+      /**
+       * Secret Key Hint
+       * @default
+       */
+      secret_key_hint: string;
+      /**
+       * Callback Secret Hint
+       * @default
+       */
+      callback_secret_hint: string;
+      /**
+       * Configured
+       * @default false
+       */
+      configured: boolean;
+      /** Last Success At */
+      last_success_at?: string | null;
+      /**
+       * Fields
+       * @default {}
+       */
+      fields: {
+        [key: string]: string;
+      };
+    };
     /** PayoutDecisionIn */
     PayoutDecisionIn: {
       status: components["schemas"]["PayoutStatus"];
       /** Note */
       note?: string | null;
     };
+    /**
+     * PayoutMethodKind
+     * @enum {string}
+     */
+    PayoutMethodKind: "CARD" | "BANK_ACCOUNT";
+    /**
+     * PayoutMethodOut
+     * @description A saved destination, as the seller sees it.
+     *
+     *     Everything here is for recognising the card. Nothing here can charge it, and
+     *     the provider token is deliberately absent — the panel has no use for it and
+     *     an API response is the last place it should appear.
+     */
+    PayoutMethodOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      kind: components["schemas"]["PayoutMethodKind"];
+      status: components["schemas"]["PayoutMethodStatus"];
+      brand: components["schemas"]["CardBrand"];
+      /** Last4 */
+      last4?: string | null;
+      /** Holder Name */
+      holder_name?: string | null;
+      /** Bank Name */
+      bank_name?: string | null;
+      /** Expires Month */
+      expires_month?: number | null;
+      /** Expires Year */
+      expires_year?: number | null;
+      /** Account Label */
+      account_label?: string | null;
+      /** Is Default */
+      is_default: boolean;
+      /** Verified At */
+      verified_at?: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Display */
+      readonly display: string;
+      /** Is Payable */
+      readonly is_payable: boolean;
+    };
+    /**
+     * PayoutMethodStatus
+     * @enum {string}
+     */
+    PayoutMethodStatus: "PENDING_VERIFICATION" | "VERIFIED" | "REVOKED" | "FAILED";
     /** PayoutOut */
     PayoutOut: {
       /**
@@ -3210,8 +3519,8 @@ export interface components {
     PayoutRequestIn: {
       /** Amount */
       amount: number | string;
-      /** Account Label */
-      account_label?: string | null;
+      /** Payout Method Id */
+      payout_method_id?: string | null;
     };
     /**
      * PayoutStatus
@@ -4046,6 +4355,11 @@ export interface components {
        * @default []
        */
       document_urls: string[];
+    };
+    /** VerifyCodeIn */
+    VerifyCodeIn: {
+      /** Code */
+      code: string;
     };
     /** WarehouseIn */
     WarehouseIn: {
@@ -5399,6 +5713,123 @@ export interface operations {
       };
     };
   };
+  list_settings_api_v1_admin_payments_settings_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentSettingOut"][];
+        };
+      };
+    };
+  };
+  save_setting_api_v1_admin_payments_settings__gateway__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gateway: components["schemas"]["PaymentGateway"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PaymentSettingIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentSettingOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_setting_api_v1_admin_payments_settings__gateway__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gateway: components["schemas"]["PaymentGateway"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  active_gateways_api_v1_admin_payments_active_get: {
+    parameters: {
+      query?: {
+        include_sandbox?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   seller_orders_api_v1_seller__seller_id__orders_get: {
     parameters: {
       query?: never;
@@ -6328,6 +6759,204 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["PayoutOut"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  payout_methods_api_v1_seller__seller_id__finance_methods_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutMethodOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_card_api_v1_seller__seller_id__finance_methods_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CardIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CardAddedOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  verify_card_api_v1_seller__seller_id__finance_methods__method_id__verify_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        method_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VerifyCodeIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutMethodOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  resend_card_code_api_v1_seller__seller_id__finance_methods__method_id__resend_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        method_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  make_default_card_api_v1_seller__seller_id__finance_methods__method_id__default_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        method_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PayoutMethodOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  revoke_card_api_v1_seller__seller_id__finance_methods__method_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+        method_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

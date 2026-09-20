@@ -31,10 +31,18 @@ import {
   Row,
   Select,
 } from "@/components/avtoqism/panel/Widgets";
-import type { CommissionRuleIn, PayoutOut, SellerOut } from "@/lib/api/types";
+import type {
+  CommissionRuleIn,
+  PaymentGateway,
+  PaymentSettingIn,
+  PaymentSettingOut,
+  PayoutOut,
+  SellerOut,
+} from "@/lib/api/types";
 import { formatDate, formatDateTime, formatSom } from "@/lib/format";
 import { useLang } from "@/lib/i18n";
 import {
+  useActiveGateways,
   useAdminLedger,
   useAdminPayouts,
   useAdminSellers,
@@ -43,7 +51,9 @@ import {
   useDecidePayout,
   useDeleteCommissionRule,
   useLedgerIntegrity,
+  usePaymentSettings,
   usePlatformBalances,
+  useSavePaymentSetting,
 } from "@/lib/query/admin";
 import { useCategories } from "@/lib/query/catalog";
 import { cn } from "@/lib/utils";
@@ -92,6 +102,21 @@ const PAYOUT_STATUS_UZ: Record<
   FAILED: { label: "Xatolik", tone: "critical" },
 };
 
+const GATEWAY_UZ: Record<string, string> = {
+  CLICK: "Click",
+  PAYME: "Payme",
+  UZUM_BANK: "Uzum Bank",
+  SANDBOX: "Sinov rejimi",
+};
+
+/**
+ * Which of a gateway's `fields` entries are credentials the form must collect,
+ * and which of those are secrets that must never be shown or pre-filled.
+ * `docs` is a link, not an input, so it is handled separately.
+ */
+const GATEWAY_INPUT_KEYS = ["merchant_id", "service_id", "secret_key", "callback_secret"] as const;
+const GATEWAY_SECRET_KEYS = new Set<string>(["secret_key", "callback_secret"]);
+
 const SCOPE_UZ: Record<string, string> = {
   GLOBAL: "Butun platforma",
   CATEGORY: "Kategoriya",
@@ -126,6 +151,7 @@ function AdminFinance() {
     <div className="space-y-6">
       <IntegrityStrip />
       <AccountsSection />
+      <PaymentGatewaysSection lang={lang} />
       <PayoutQueue sellers={sellers.data} lang={lang} />
       <CommissionRulesSection sellers={sellers.data} />
       <LedgerExplorer sellers={sellers.data} lang={lang} />
@@ -241,6 +267,310 @@ function AccountsSection() {
         </DataTable>
       )}
     </PanelSection>
+  );
+}
+
+/* --- payment gateways -------------------------------------------------------------------- */
+/**
+ * What a buyer can pay with, and with whose credentials.
+ *
+ * Two things this screen is careful about. A stored secret is never sent back
+ * by the server, so the form starts blank and a blank field means "keep it" —
+ * saving a gateway without retyping the key must not wipe it. And the provider
+ * that takes payments is not necessarily the one that holds saved cards, so
+ * that is said out loud below rather than left to be assumed.
+ */
+function PaymentGatewaysSection({ lang }: { lang: "uz" | "ru" }) {
+  const settings = usePaymentSettings();
+  const active = useActiveGateways();
+  const save = useSavePaymentSetting();
+  const [editing, setEditing] = useState<PaymentSettingOut | null>(null);
+
+  const togglingGateway = save.isPending ? (save.variables?.gateway ?? null) : null;
+
+  return (
+    <PanelSection
+      title="To'lov tizimlari"
+      subtitle="Har bir tizim o'zining kalitlari bilan ishlaydi. Kalitlar shifrlangan holda saqlanadi va bu yerda hech qachon ochiq ko'rsatilmaydi."
+    >
+      {settings.isPending ? (
+        <TableSkeleton rows={4} />
+      ) : settings.isError ? (
+        <div className="p-5">
+          <ErrorState error={settings.error} onRetry={() => void settings.refetch()} compact />
+        </div>
+      ) : (
+        <ul className="grid gap-px bg-border">
+          {settings.data.map((row) => {
+            const fields = row.fields;
+            const busy = togglingGateway === row.gateway;
+            const rowError =
+              save.isError && save.variables?.gateway === row.gateway ? save.error.message : null;
+            const usesSecret = (fields["secret_key"] ?? "") !== "";
+            const docs = fields["docs"] ?? "";
+
+            return (
+              <li key={row.gateway} className="bg-card p-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-display text-base font-bold">
+                    {GATEWAY_UZ[row.gateway] ?? row.gateway}
+                  </span>
+                  <Pill tone={row.is_active ? "good" : row.configured ? "info" : "neutral"}>
+                    {row.is_active ? "Faol" : row.configured ? "Sozlangan" : "Sozlanmagan"}
+                  </Pill>
+                  <Pill tone={row.is_live ? "warning" : "neutral"}>
+                    {row.is_live ? "Jonli" : "Test"}
+                  </Pill>
+                </div>
+
+                <dl className="type-caption mt-3 grid gap-1 sm:grid-cols-2">
+                  {(fields["merchant_id"] ?? "") !== "" && (
+                    <div className="flex gap-2">
+                      <dt>{fields["merchant_id"]}:</dt>
+                      <dd className="font-mono">{row.merchant_id ?? "—"}</dd>
+                    </div>
+                  )}
+                  {(fields["service_id"] ?? "") !== "" && (
+                    <div className="flex gap-2">
+                      <dt>{fields["service_id"]}:</dt>
+                      <dd className="font-mono">{row.service_id ?? "—"}</dd>
+                    </div>
+                  )}
+                  {usesSecret && (
+                    <div className="flex gap-2">
+                      <dt>{fields["secret_key"]}:</dt>
+                      <dd className="font-mono">
+                        {row.secret_key_hint === "" ? "—" : row.secret_key_hint}
+                      </dd>
+                    </div>
+                  )}
+                  <div className="flex gap-2 sm:col-span-2">
+                    <dt>
+                      {row.last_success_at
+                        ? "oxirgi muvaffaqiyatli to'lov:"
+                        : "hali to'lov bo'lmagan"}
+                    </dt>
+                    {row.last_success_at && <dd>{formatDateTime(row.last_success_at, lang)}</dd>}
+                  </div>
+                </dl>
+
+                {row.note && <p className="type-caption mt-2">{row.note}</p>}
+                {docs !== "" && (
+                  <p className="type-caption mt-2">
+                    <a
+                      href={docs}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="underline underline-offset-2"
+                    >
+                      Hujjatlar
+                    </a>
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setEditing(row)}>
+                    Sozlash
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={row.is_active ? "danger" : "primary"}
+                    disabled={busy}
+                    onClick={() => save.mutate({ gateway: row.gateway, is_active: !row.is_active })}
+                  >
+                    {busy ? "…" : row.is_active ? "O'chirish" : "Yoqish"}
+                  </Button>
+                </div>
+
+                {rowError && <p className="mt-2 text-sm text-destructive">{rowError}</p>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <div className="border-t border-border px-5 py-4">
+        {active.isPending ? (
+          <LineSkeleton className="h-4 w-64" />
+        ) : active.isError ? (
+          <ErrorState error={active.error} onRetry={() => void active.refetch()} compact />
+        ) : (
+          <>
+            <p className="text-sm">
+              {active.data.gateways.length === 0
+                ? "Hozircha birorta to'lov tizimi yoqilmagan."
+                : `Yoqilgan to'lov tizimlari: ${active.data.gateways
+                    .map((gateway) => GATEWAY_UZ[gateway] ?? gateway)
+                    .join(", ")}.`}
+            </p>
+            <p className="type-caption mt-1">
+              Xaridor har doim naqd pul bilan to'lay oladi. Kartalarni saqlash moduli:{" "}
+              {active.data.card_tokenizer}.
+            </p>
+            {active.data.card_tokenizer_note !== "" && (
+              <p className="mt-3 border border-warning/40 bg-warning/10 px-3 py-2 text-sm">
+                {active.data.card_tokenizer_note}
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      <Panel
+        open={editing !== null}
+        title={editing ? (GATEWAY_UZ[editing.gateway] ?? editing.gateway) : ""}
+        onClose={() => setEditing(null)}
+      >
+        {editing && <GatewayForm setting={editing} onDone={() => setEditing(null)} />}
+      </Panel>
+    </PanelSection>
+  );
+}
+
+function GatewayForm({ setting, onDone }: { setting: PaymentSettingOut; onDone: () => void }) {
+  const save = useSavePaymentSetting();
+  const fields = setting.fields;
+
+  const [merchantId, setMerchantId] = useState(setting.merchant_id ?? "");
+  const [serviceId, setServiceId] = useState(setting.service_id ?? "");
+  // The secrets start empty and stay empty unless the admin retypes them: the
+  // form never received the stored value, so it must not be able to overwrite it
+  // with a blank.
+  const [secretKey, setSecretKey] = useState("");
+  const [callbackSecret, setCallbackSecret] = useState("");
+  const [isLive, setIsLive] = useState(setting.is_live);
+  const [returnUrl, setReturnUrl] = useState(setting.return_url ?? "");
+  const [note, setNote] = useState(setting.note ?? "");
+
+  const used = (key: (typeof GATEWAY_INPUT_KEYS)[number]) => (fields[key] ?? "") !== "";
+  const label = (key: (typeof GATEWAY_INPUT_KEYS)[number]) => fields[key] ?? key;
+  const anyInput = GATEWAY_INPUT_KEYS.some((key) => used(key));
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (save.isPending) return;
+    const body: PaymentSettingIn & { gateway: PaymentGateway } = {
+      gateway: setting.gateway,
+      is_live: isLive,
+      return_url: returnUrl.trim(),
+      note: note.trim(),
+    };
+    if (used("merchant_id")) body.merchant_id = merchantId.trim();
+    if (used("service_id")) body.service_id = serviceId.trim();
+    if (used("secret_key") && secretKey !== "") body.secret_key = secretKey;
+    if (used("callback_secret") && callbackSecret !== "") body.callback_secret = callbackSecret;
+    save.mutate(body, {
+      onSuccess: onDone,
+      // A secret lives in this form only as long as the request does.
+      onSettled: () => {
+        setSecretKey("");
+        setCallbackSecret("");
+      },
+    });
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={submit}>
+      {!anyInput && (
+        <p className="type-caption">
+          Bu tizim hech qanday kalit talab qilmaydi — uni shunchaki yoqish kifoya.
+        </p>
+      )}
+
+      {used("merchant_id") && (
+        <Field label={label("merchant_id")}>
+          <Input
+            value={merchantId}
+            onChange={(event) => setMerchantId(event.target.value)}
+            maxLength={120}
+            autoComplete="off"
+          />
+        </Field>
+      )}
+
+      {used("service_id") && (
+        <Field label={label("service_id")}>
+          <Input
+            value={serviceId}
+            onChange={(event) => setServiceId(event.target.value)}
+            maxLength={120}
+            autoComplete="off"
+          />
+        </Field>
+      )}
+
+      {used("secret_key") && (
+        <Field
+          label={label("secret_key")}
+          hint={
+            setting.secret_key_hint === ""
+              ? "Hozircha kalit saqlanmagan."
+              : `Saqlangan kalit: ${setting.secret_key_hint}. Bo'sh qoldirilsa, o'sha kalit o'zgarmaydi.`
+          }
+        >
+          <Input
+            type="password"
+            value={secretKey}
+            onChange={(event) => setSecretKey(event.target.value)}
+            maxLength={400}
+            autoComplete="new-password"
+          />
+        </Field>
+      )}
+
+      {used("callback_secret") && (
+        <Field
+          label={label("callback_secret")}
+          hint={
+            setting.callback_secret_hint === ""
+              ? "Hozircha kalit saqlanmagan."
+              : `Saqlangan kalit: ${setting.callback_secret_hint}. Bo'sh qoldirilsa, o'sha kalit o'zgarmaydi.`
+          }
+        >
+          <Input
+            type="password"
+            value={callbackSecret}
+            onChange={(event) => setCallbackSecret(event.target.value)}
+            maxLength={400}
+            autoComplete="new-password"
+          />
+        </Field>
+      )}
+
+      <Field label="Qaytish manzili" hint="To'lovdan keyin xaridor shu manzilga qaytariladi.">
+        <Input
+          value={returnUrl}
+          onChange={(event) => setReturnUrl(event.target.value)}
+          maxLength={500}
+          placeholder="https://avtoqism.uz/orders"
+        />
+      </Field>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          className="size-4 border border-input accent-primary"
+          checked={isLive}
+          onChange={(event) => setIsLive(event.target.checked)}
+        />
+        Jonli rejim — haqiqiy pul
+      </label>
+
+      <Field label="Izoh" hint="Bu kalitlar kimning kabinetidan olingani — keyin kerak bo'ladi.">
+        <Input value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} />
+      </Field>
+
+      {save.isError && <p className="text-sm text-destructive">{save.error.message}</p>}
+
+      <div className="flex gap-2">
+        <Button type="submit" disabled={save.isPending}>
+          {save.isPending ? "Saqlanmoqda…" : "Saqlash"}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone}>
+          Bekor qilish
+        </Button>
+      </div>
+    </form>
   );
 }
 

@@ -52,6 +52,7 @@ export const qk = {
   ledger: (sellerId: string, filters: Record<string, unknown>) =>
     ["seller", sellerId, "ledger", filters] as const,
   payouts: (sellerId: string) => ["seller", sellerId, "payouts"] as const,
+  payoutMethods: (sellerId: string) => ["seller", sellerId, "payout-methods"] as const,
 
   promotions: (sellerId: string) => ["seller", sellerId, "promotions"] as const,
   campaigns: (sellerId: string) => ["seller", sellerId, "campaigns"] as const,
@@ -82,6 +83,8 @@ export const qk = {
   adminBanners: ["admin", "banners"] as const,
   adminSellers: ["admin", "sellers"] as const,
   adminPromotions: ["admin", "promotions"] as const,
+  adminPaymentSettings: ["admin", "payment-settings"] as const,
+  adminPaymentActive: ["admin", "payment-active"] as const,
 
   /* --- storefront -------------------------------------------------------- */
   adSlot: (slot: string, params: Record<string, unknown>) => ["ads", slot, params] as const,

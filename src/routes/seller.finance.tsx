@@ -36,12 +36,19 @@ import {
 } from "@/components/avtoqism/panel/Widgets";
 import { formatDate, formatDateTime, formatSom, groupDigits } from "@/lib/format";
 import { useLang } from "@/lib/i18n";
+import type { PayoutMethodOut } from "@/lib/api/types";
 import {
+  useAddCard,
   useBalance,
   useLedger,
+  useMakeDefaultCard,
+  usePayoutMethods,
   usePayouts,
   useRequestPayout,
+  useResendCardCode,
+  useRevokeCard,
   useSellerMoneyFlow,
+  useVerifyCard,
 } from "@/lib/query/seller";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +73,29 @@ const PAYOUT_STATUS_UZ: Record<
   REJECTED: { label: "Rad etildi", tone: "critical" },
   FAILED: { label: "Xatolik", tone: "critical" },
 };
+
+const METHOD_STATUS_UZ: Record<
+  string,
+  { label: string; tone: "neutral" | "good" | "warning" | "critical" | "info" }
+> = {
+  PENDING_VERIFICATION: { label: "Tasdiqlanmagan", tone: "warning" },
+  VERIFIED: { label: "Tasdiqlangan", tone: "good" },
+  REVOKED: { label: "O'chirilgan", tone: "neutral" },
+  FAILED: { label: "Bloklangan", tone: "critical" },
+};
+
+/** Groups of four while typing, so the eye can check the number against the card. */
+function groupCardNumber(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 19);
+  const groups = digits.match(/.{1,4}/g);
+  return groups ? groups.join(" ") : "";
+}
+
+function expiryLabel(month: number | null | undefined, year: number | null | undefined): string {
+  if (!month || !year) return "";
+  const mm = month < 10 ? `0${month}` : String(month);
+  return `${mm}/${String(year).slice(-2)}`;
+}
 
 const LEDGER_KIND_UZ: Record<string, string> = {
   ORDER_CAPTURE: "To'lov",
@@ -103,6 +133,9 @@ function SellerFinance() {
   const payouts = usePayouts(sellerId);
 
   const [payoutOpen, setPayoutOpen] = useState(false);
+  const [addCardOpen, setAddCardOpen] = useState(false);
+  const methods = usePayoutMethods(sellerId);
+  const payableMethods = (methods.data ?? []).filter((method) => method.is_payable);
 
   const withdrawable = balance.data
     ? Math.max(num(balance.data.available) - num(balance.data.reserved), 0)
@@ -178,6 +211,16 @@ function SellerFinance() {
         onRetry={() => void moneyFlow.refetch()}
       />
 
+      {/* --- where the money lands --- */}
+      <CardsSection
+        sellerId={sellerId}
+        methods={methods.data ?? null}
+        isPending={methods.isPending}
+        error={methods.isError ? methods.error : null}
+        onRetry={() => void methods.refetch()}
+        onAddCard={() => setAddCardOpen(true)}
+      />
+
       {/* --- payouts --- */}
       <PanelSection
         title="Pul yechish so'rovlari"
@@ -241,9 +284,18 @@ function SellerFinance() {
           <PayoutForm
             sellerId={sellerId}
             withdrawable={withdrawable}
+            methods={payableMethods}
             onDone={() => setPayoutOpen(false)}
+            onAddCard={() => {
+              setPayoutOpen(false);
+              setAddCardOpen(true);
+            }}
           />
         )}
+      </Panel>
+
+      <Panel open={addCardOpen} title="Karta qo'shish" onClose={() => setAddCardOpen(false)}>
+        {addCardOpen && <AddCardFlow sellerId={sellerId} onDone={() => setAddCardOpen(false)} />}
       </Panel>
     </div>
   );
@@ -344,30 +396,422 @@ function MoneyFlowCard({
   );
 }
 
+/* --- payout cards ------------------------------------------------------------------ */
+/**
+ * The cards the money can land on.
+ *
+ * A card is useless until it is verified, so the list says so on the card
+ * itself rather than letting a seller discover it when a payout is refused.
+ */
+function CardsSection({
+  sellerId,
+  methods,
+  isPending,
+  error,
+  onRetry,
+  onAddCard,
+}: {
+  sellerId: string;
+  methods: PayoutMethodOut[] | null;
+  isPending: boolean;
+  error: Error | null;
+  onRetry: () => void;
+  onAddCard: () => void;
+}) {
+  const makeDefault = useMakeDefaultCard(sellerId);
+  const revoke = useRevokeCard(sellerId);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+
+  return (
+    <PanelSection
+      title="Pul yechish kartalari"
+      subtitle="Pul faqat shu yerdagi tasdiqlangan kartaga o'tkaziladi."
+      action={
+        <Button size="sm" onClick={onAddCard}>
+          Karta qo'shish
+        </Button>
+      }
+    >
+      {isPending ? (
+        <div className="space-y-3 p-5">
+          {Array.from({ length: 2 }, (_, index) => (
+            <LineSkeleton key={index} className="h-16 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-5">
+          <ErrorState error={error} onRetry={onRetry} compact />
+        </div>
+      ) : !methods || methods.length === 0 ? (
+        <div className="px-5 py-14 text-center">
+          <p className="type-caption">
+            Hali karta qo'shilmagan. Pul yechish uchun avval karta qo'shing va uni SMS kod bilan
+            tasdiqlang.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={onAddCard}>Karta qo'shish</Button>
+          </div>
+        </div>
+      ) : (
+        <ul className="grid gap-px bg-border sm:grid-cols-2">
+          {methods.map((method) => {
+            const status = METHOD_STATUS_UZ[method.status] ?? {
+              label: method.status,
+              tone: "neutral" as const,
+            };
+            const expiry = expiryLabel(method.expires_month, method.expires_year);
+            const defaultBusy = makeDefault.isPending && makeDefault.variables === method.id;
+            const revokeBusy = revoke.isPending && revoke.variables === method.id;
+            const defaultError =
+              makeDefault.isError && makeDefault.variables === method.id
+                ? makeDefault.error.message
+                : null;
+            const revokeError =
+              revoke.isError && revoke.variables === method.id ? revoke.error.message : null;
+
+            return (
+              <li key={method.id} className="bg-card p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold">{method.display}</span>
+                  <Pill tone={status.tone}>{status.label}</Pill>
+                  {method.is_default && <Pill tone="info">Asosiy</Pill>}
+                </div>
+                <p className="type-caption mt-1">
+                  {method.holder_name ?? "Egasi ko'rsatilmagan"}
+                  {expiry ? ` · ${expiry}` : ""}
+                </p>
+
+                {verifyingId === method.id ? (
+                  <div className="mt-3 border border-border p-3">
+                    <CardCodeStep
+                      sellerId={sellerId}
+                      methodId={method.id}
+                      initialDevCode={null}
+                      onDone={() => setVerifyingId(null)}
+                      onCancel={() => setVerifyingId(null)}
+                    />
+                  </div>
+                ) : confirmingId === method.id ? (
+                  <div className="mt-3 border border-destructive/40 bg-destructive/8 p-3">
+                    <p className="text-sm">
+                      Bu karta o'chiriladi va unga boshqa pul o'tkazilmaydi. Davom etamizmi?
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={revokeBusy}
+                        onClick={() =>
+                          revoke.mutate(method.id, { onSuccess: () => setConfirmingId(null) })
+                        }
+                      >
+                        {revokeBusy ? "O'chirilmoqda…" : "Ha, o'chirilsin"}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setConfirmingId(null)}>
+                        Bekor qilish
+                      </Button>
+                    </div>
+                    {revokeError && <p className="mt-2 text-sm text-destructive">{revokeError}</p>}
+                  </div>
+                ) : (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {!method.is_payable && method.status === "PENDING_VERIFICATION" && (
+                      <Button size="sm" onClick={() => setVerifyingId(method.id)}>
+                        Tasdiqlash
+                      </Button>
+                    )}
+                    {method.is_payable && !method.is_default && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={defaultBusy}
+                        onClick={() => makeDefault.mutate(method.id)}
+                      >
+                        {defaultBusy ? "Saqlanmoqda…" : "Asosiy qilish"}
+                      </Button>
+                    )}
+                    {method.status !== "REVOKED" && (
+                      <Button size="sm" variant="danger" onClick={() => setConfirmingId(method.id)}>
+                        O'chirish
+                      </Button>
+                    )}
+                  </div>
+                )}
+
+                {defaultError && <p className="mt-2 text-sm text-destructive">{defaultError}</p>}
+                {revokeError && confirmingId !== method.id && (
+                  <p className="mt-2 text-sm text-destructive">{revokeError}</p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </PanelSection>
+  );
+}
+
+/* --- add a card ---------------------------------------------------------------------- */
+/**
+ * Two steps in one panel: the number, then the code.
+ *
+ * The number lives in state only until the request returns, and is cleared the
+ * moment it does — it is never read back, never logged and never rendered
+ * again. What comes back is an id and a masked card.
+ */
+function AddCardFlow({ sellerId, onDone }: { sellerId: string; onDone: () => void }) {
+  const add = useAddCard(sellerId);
+  const thisYear = new Date().getFullYear();
+
+  const [number, setNumber] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [holder, setHolder] = useState("");
+  const [makeDefault, setMakeDefault] = useState(false);
+  const [pendingMethodId, setPendingMethodId] = useState<string | null>(null);
+  const [devCode, setDevCode] = useState<string | null>(null);
+
+  const digits = number.replace(/\D/g, "");
+  const valid = digits.length >= 12 && digits.length <= 19;
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!valid || add.isPending) return;
+    add.mutate(
+      {
+        number: digits,
+        expires_month: month === "" ? null : Number(month),
+        expires_year: year === "" ? null : Number(year),
+        holder_name: holder.trim() === "" ? null : holder.trim(),
+        make_default: makeDefault,
+      },
+      {
+        onSuccess: (result) => {
+          setPendingMethodId(result.method.id);
+          setDevCode(result.dev_code ?? null);
+        },
+        // Whether it worked or not, the number leaves this browser's memory.
+        onSettled: () => setNumber(""),
+      },
+    );
+  }
+
+  if (pendingMethodId !== null) {
+    return (
+      <CardCodeStep
+        sellerId={sellerId}
+        methodId={pendingMethodId}
+        initialDevCode={devCode}
+        onDone={onDone}
+        onCancel={onDone}
+      />
+    );
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={submit}>
+      <Field label="Karta raqami">
+        <Input
+          value={number}
+          onChange={(event) => setNumber(groupCardNumber(event.target.value))}
+          inputMode="numeric"
+          autoComplete="cc-number"
+          placeholder="8600 1234 5678 9012"
+          maxLength={23}
+          required
+        />
+        <span className="type-caption mt-1 block">
+          Raqam to'g'ridan-to'g'ri to'lov provayderiga yuboriladi. AVTOQISMda faqat oxirgi to'rt
+          raqam saqlanadi.
+        </span>
+      </Field>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Amal qilish oyi">
+          <Select
+            value={month}
+            onChange={(event) => setMonth(event.target.value)}
+            autoComplete="cc-exp-month"
+          >
+            <option value="">Tanlang</option>
+            {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
+              <option key={value} value={value}>
+                {value < 10 ? `0${value}` : value}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Amal qilish yili">
+          <Select
+            value={year}
+            onChange={(event) => setYear(event.target.value)}
+            autoComplete="cc-exp-year"
+          >
+            <option value="">Tanlang</option>
+            {Array.from({ length: 12 }, (_, index) => thisYear + index).map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
+
+      <Field label="Karta egasi" hint="Kartada yozilganidek.">
+        <Input
+          value={holder}
+          onChange={(event) => setHolder(event.target.value)}
+          autoComplete="cc-name"
+          maxLength={120}
+          placeholder="ALISHER KARIMOV"
+        />
+      </Field>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          className="size-4 border border-input accent-primary"
+          checked={makeDefault}
+          onChange={(event) => setMakeDefault(event.target.checked)}
+        />
+        Asosiy karta qilish
+      </label>
+
+      {add.isError && <p className="text-sm text-destructive">{add.error.message}</p>}
+
+      <div className="flex gap-2">
+        <Button type="submit" disabled={!valid || add.isPending}>
+          {add.isPending ? "Yuborilmoqda…" : "Davom etish"}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone}>
+          Bekor qilish
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+/* --- the code step ------------------------------------------------------------------ */
+function CardCodeStep({
+  sellerId,
+  methodId,
+  initialDevCode,
+  onDone,
+  onCancel,
+}: {
+  sellerId: string;
+  methodId: string;
+  initialDevCode: string | null;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
+  const verify = useVerifyCard(sellerId);
+  const resend = useResendCardCode(sellerId);
+  const [code, setCode] = useState("");
+  const [devCode, setDevCode] = useState<string | null>(initialDevCode);
+
+  const valid = code.length >= 4;
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!valid || verify.isPending) return;
+    verify.mutate({ methodId, code }, { onSuccess: onDone });
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={submit}>
+      <p className="type-caption">
+        Kartaga biriktirilgan telefon raqamiga tasdiqlash kodi yuborildi. Kod kiritilmaguncha bu
+        kartaga pul o'tkazilmaydi.
+      </p>
+
+      <Field label="Tasdiqlash kodi">
+        <Input
+          value={code}
+          onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder="000000"
+          maxLength={6}
+          required
+        />
+      </Field>
+
+      {devCode !== null && devCode !== "" && (
+        <p className="type-caption">
+          Ishlab chiqish rejimidagi kod: <span className="font-mono">{devCode}</span> — haqiqiy SMS
+          yuborilmadi, kod server jurnaliga yozildi.
+        </p>
+      )}
+
+      {verify.isError && <p className="text-sm text-destructive">{verify.error.message}</p>}
+      {resend.isError && <p className="text-sm text-destructive">{resend.error.message}</p>}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="submit" disabled={!valid || verify.isPending}>
+          {verify.isPending ? "Tekshirilmoqda…" : "Tasdiqlash"}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={resend.isPending}
+          onClick={() =>
+            resend.mutate(methodId, {
+              onSuccess: (result) => setDevCode(result.dev_code ?? null),
+            })
+          }
+        >
+          {resend.isPending ? "Yuborilmoqda…" : "Qayta yuborish"}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>
+          Keyinroq
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 /* --- payout form ------------------------------------------------------------------ */
 function PayoutForm({
   sellerId,
   withdrawable,
+  methods,
   onDone,
+  onAddCard,
 }: {
   sellerId: string;
   withdrawable: number;
+  methods: PayoutMethodOut[];
   onDone: () => void;
+  onAddCard: () => void;
 }) {
   const request = useRequestPayout(sellerId);
   const [amount, setAmount] = useState("");
-  const [account, setAccount] = useState("");
+  const [methodId, setMethodId] = useState(
+    () => (methods.find((method) => method.is_default) ?? methods[0])?.id ?? "",
+  );
 
   const value = Number(amount);
   const belowMinimum = Number.isFinite(value) && value > 0 && value < MIN_PAYOUT;
   const aboveBalance = Number.isFinite(value) && value > withdrawable;
-  const valid =
-    Number.isFinite(value) && value >= MIN_PAYOUT && !aboveBalance && account.trim().length >= 4;
+  const valid = Number.isFinite(value) && value >= MIN_PAYOUT && !aboveBalance && methodId !== "";
+
+  if (methods.length === 0) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm">
+          Pul yechish uchun tasdiqlangan karta kerak. Karta qo'shib, SMS kod bilan tasdiqlang.
+        </p>
+        <Button onClick={onAddCard}>Karta qo'shish</Button>
+      </div>
+    );
+  }
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!valid) return;
-    request.mutate({ amount: value, account_label: account.trim() }, { onSuccess: onDone });
+    request.mutate({ amount: value, payout_method_id: methodId }, { onSuccess: onDone });
   }
 
   return (
@@ -387,7 +831,9 @@ function PayoutForm({
           <Input
             type="number"
             min={MIN_PAYOUT}
-            step={1000}
+            // Whole som, any amount: a 1000-step would make "Hammasini" — which
+            // is rarely a round number — fail the browser's own validation.
+            step={1}
             inputMode="numeric"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
@@ -403,17 +849,15 @@ function PayoutForm({
         </div>
       </Field>
 
-      <Field
-        label="Hisob"
-        hint="Bank nomi va karta/hisob raqamining oxirgi to'rt raqami. To'liq raqamni yozmang — u bu yerda saqlanmaydi."
-      >
-        <Input
-          value={account}
-          onChange={(event) => setAccount(event.target.value)}
-          placeholder="Kapitalbank · 1234"
-          maxLength={60}
-          required
-        />
+      <Field label="Karta" hint="Pul shu kartaga o'tkaziladi.">
+        <Select value={methodId} onChange={(event) => setMethodId(event.target.value)} required>
+          {methods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.display}
+              {method.is_default ? " · asosiy" : ""}
+            </option>
+          ))}
+        </Select>
       </Field>
 
       {request.isError && <p className="text-sm text-destructive">{request.error.message}</p>}

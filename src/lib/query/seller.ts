@@ -15,6 +15,9 @@ import type {
   CampaignOut,
   CampaignStatusIn,
   CampaignUpdateIn,
+  CardAddedOut,
+  CardCodeResent,
+  CardIn,
   CategorySlice,
   CreativeIn,
   CreativeOut,
@@ -22,6 +25,7 @@ import type {
   MovementOut,
   MoneyFlowDay,
   OfferUpsertIn,
+  PayoutMethodOut,
   PayoutOut,
   PayoutRequestIn,
   PlacementOut,
@@ -295,6 +299,72 @@ export function useRequestPayout(sellerId: string) {
   return useMutation({
     mutationFn: (input: PayoutRequestIn) =>
       safeApi<PayoutOut>(`/seller/${sellerId}/finance/payouts`, { method: "POST", body: input }),
+    onSuccess: invalidate,
+  });
+}
+
+/* --- payout cards --------------------------------------------------------------
+ * Where the money lands. A card is added once, verified by SMS code, and from
+ * then on is only ever referred to by its id — the number itself never makes a
+ * second trip through this app.
+ */
+export function usePayoutMethods(sellerId: string) {
+  return useQuery({
+    queryKey: qk.payoutMethods(sellerId),
+    queryFn: () => safeApi<PayoutMethodOut[]>(`/seller/${sellerId}/finance/methods`),
+    enabled: Boolean(sellerId),
+  });
+}
+
+export function useAddCard(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (input: CardIn) =>
+      safeApi<CardAddedOut>(`/seller/${sellerId}/finance/methods`, {
+        method: "POST",
+        body: input,
+      }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useVerifyCard(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: ({ methodId, code }: { methodId: string; code: string }) =>
+      safeApi<PayoutMethodOut>(`/seller/${sellerId}/finance/methods/${methodId}/verify`, {
+        method: "POST",
+        body: { code },
+      }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useResendCardCode(sellerId: string) {
+  return useMutation({
+    mutationFn: (methodId: string) =>
+      safeApi<CardCodeResent>(`/seller/${sellerId}/finance/methods/${methodId}/resend`, {
+        method: "POST",
+      }),
+  });
+}
+
+export function useMakeDefaultCard(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (methodId: string) =>
+      safeApi<PayoutMethodOut>(`/seller/${sellerId}/finance/methods/${methodId}/default`, {
+        method: "POST",
+      }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useRevokeCard(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (methodId: string) =>
+      safeApi<void>(`/seller/${sellerId}/finance/methods/${methodId}`, { method: "DELETE" }),
     onSuccess: invalidate,
   });
 }

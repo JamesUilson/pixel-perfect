@@ -70,6 +70,19 @@ export type CommissionRuleOut = S["CommissionRuleOut"];
 export type CommissionRuleIn = S["CommissionRuleIn"];
 export type LedgerAccount = S["LedgerAccount"];
 
+export type PayoutMethodOut = S["PayoutMethodOut"];
+export type PayoutMethodKind = S["PayoutMethodKind"];
+export type PayoutMethodStatus = S["PayoutMethodStatus"];
+export type CardBrand = S["CardBrand"];
+export type CardIn = S["CardIn"];
+export type CardAddedOut = S["CardAddedOut"];
+export type VerifyCodeIn = S["VerifyCodeIn"];
+
+/* --- payment gateways ------------------------------------------------------- */
+export type PaymentGateway = S["PaymentGateway"];
+export type PaymentSettingOut = S["PaymentSettingOut"];
+export type PaymentSettingIn = S["PaymentSettingIn"];
+
 export type PromotionOut = S["PromotionOut"];
 export type PromotionIn = S["PromotionIn"];
 export type PromotionUpdateIn = S["PromotionUpdateIn"];
@@ -214,6 +227,21 @@ export type CustomerSummary = {
 export type LedgerIntegrity = {
   balanced: boolean;
   groups: { group_id: string; difference: string }[];
+};
+
+/**
+ * Two endpoints answer with a plain dict, which FastAPI describes only as
+ * `object`, so their shapes are spelled out here rather than generated.
+ */
+export type CardCodeResent = { sent: boolean; dev_code: string | null };
+export type ActiveGatewaysOut = {
+  gateways: PaymentGateway[];
+  card_tokenizer: string;
+  card_tokenizer_preferred: string;
+  /** Empty when the payment gateway and the card vault are the same provider. */
+  card_tokenizer_note: string;
+  tokenizers: Record<string, boolean>;
+  always_available: string[];
 };
 
 /** Paginated envelope. The generated types name one per item type. */
