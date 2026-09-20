@@ -1,0 +1,13 @@
+node_modules
+.output
+.nitro
+.wrangler
+.tanstack
+dist
+.git
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+e2e-failure.png
