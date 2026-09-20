@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, MapPin, ShieldCheck, Star, Truck } from "lucide-react";
 
 import cobalt from "@/assets/car-cobalt.jpg";
+import { HomeSlider } from "@/components/avtoqism/HomeSlider";
 import { Page, SectionHead } from "@/components/avtoqism/Page";
 import { ProductCard } from "@/components/avtoqism/ProductCard";
 import { ErrorState, ProductGridSkeleton } from "@/components/avtoqism/States";
@@ -47,6 +48,9 @@ function Home() {
 
   return (
     <Page>
+      {/* --- ad slot: campaigns and house banners, already merged by the API - */}
+      <HomeSlider />
+
       {/* --- hero ---------------------------------------------------------- */}
       <section className="grid items-center gap-8 pb-16 lg:grid-cols-[0.8fr_1.2fr] lg:pb-24">
         <div className="enter-rise flex flex-col justify-center">

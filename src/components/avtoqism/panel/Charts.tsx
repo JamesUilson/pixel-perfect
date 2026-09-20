@@ -83,12 +83,24 @@ export function ChartCard({
         </div>
         {action}
       </div>
-      <div style={{ height }}>
-        <ResponsiveContainer width="100%" height="100%">
-          {children as never}
-        </ResponsiveContainer>
-      </div>
+      {/*
+       * A plain sized box, not a ResponsiveContainer. The container measures
+       * its parent and clones its child to inject width and height, so it has
+       * to sit immediately around the Recharts element — one layer of our own
+       * components in between and the chart is handed props it ignores and
+       * renders at zero size. Each chart below therefore brings its own.
+       */}
+      <div style={{ height }}>{children}</div>
     </section>
+  );
+}
+
+/** Every chart is wrapped here, next to its Recharts element and nowhere else. */
+function Responsive({ children }: { children: ReactNode }) {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      {children as never}
+    </ResponsiveContainer>
   );
 }
 
@@ -144,39 +156,41 @@ export function RevenueArea({
   valueKey = "revenue",
   name = "Savdo",
 }: {
-  data: { day: string; [key: string]: unknown }[];
+  data: Record<string, unknown>[];
   valueKey?: string | undefined;
   name?: string | undefined;
 }) {
   return (
-    <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-      <defs>
-        <linearGradient id="viz-area-1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={vizColor(0)} stopOpacity={0.18} />
-          <stop offset="100%" stopColor={vizColor(0)} stopOpacity={0.02} />
-        </linearGradient>
-      </defs>
-      <CartesianGrid stroke={VIZ_GRID} vertical={false} />
-      <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
-      <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
-      <Tooltip
-        content={<VizTooltip />}
-        cursor={{ stroke: VIZ_AXIS, strokeWidth: 1 }}
-        labelFormatter={shortDay}
-      />
-      <Area
-        type="monotone"
-        dataKey={(row: Record<string, unknown>) => num(row[valueKey] as string)}
-        name={name}
-        stroke={vizColor(0)}
-        strokeWidth={2}
-        fill="url(#viz-area-1)"
-        // A dot per day turns a month into a dotted mess; the crosshair carries
-        // the per-day value instead.
-        dot={false}
-        activeDot={{ r: 4, strokeWidth: 2, stroke: VIZ_SURFACE }}
-      />
-    </AreaChart>
+    <Responsive>
+      <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id="viz-area-1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={vizColor(0)} stopOpacity={0.18} />
+            <stop offset="100%" stopColor={vizColor(0)} stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid stroke={VIZ_GRID} vertical={false} />
+        <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
+        <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
+        <Tooltip
+          content={<VizTooltip />}
+          cursor={{ stroke: VIZ_AXIS, strokeWidth: 1 }}
+          labelFormatter={shortDay}
+        />
+        <Area
+          type="monotone"
+          dataKey={(row: Record<string, unknown>) => num(row[valueKey] as string)}
+          name={name}
+          stroke={vizColor(0)}
+          strokeWidth={2}
+          fill="url(#viz-area-1)"
+          // A dot per day turns a month into a dotted mess; the crosshair carries
+          // the per-day value instead.
+          dot={false}
+          activeDot={{ r: 4, strokeWidth: 2, stroke: VIZ_SURFACE }}
+        />
+      </AreaChart>
+    </Responsive>
   );
 }
 
@@ -190,31 +204,33 @@ export function MultiLine({
   money?: boolean | undefined;
 }) {
   return (
-    <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-      <CartesianGrid stroke={VIZ_GRID} vertical={false} />
-      <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
-      <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
-      <Tooltip
-        content={<VizTooltip money={money} />}
-        cursor={{ stroke: VIZ_AXIS, strokeWidth: 1 }}
-        labelFormatter={shortDay}
-      />
-      {series.length > 1 && <Legend {...legendProps} />}
-      {series.map((s, index) => (
-        <Line
-          key={s.key}
-          type="monotone"
-          dataKey={(row: Record<string, unknown>) => num(row[s.key] as string)}
-          name={s.name}
-          stroke={vizColor(index)}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          dot={false}
-          activeDot={{ r: 4, strokeWidth: 2, stroke: VIZ_SURFACE }}
+    <Responsive>
+      <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <CartesianGrid stroke={VIZ_GRID} vertical={false} />
+        <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
+        <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
+        <Tooltip
+          content={<VizTooltip money={money} />}
+          cursor={{ stroke: VIZ_AXIS, strokeWidth: 1 }}
+          labelFormatter={shortDay}
         />
-      ))}
-    </LineChart>
+        {series.length > 1 && <Legend {...legendProps} />}
+        {series.map((s, index) => (
+          <Line
+            key={s.key}
+            type="monotone"
+            dataKey={(row: Record<string, unknown>) => num(row[s.key] as string)}
+            name={s.name}
+            stroke={vizColor(index)}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            dot={false}
+            activeDot={{ r: 4, strokeWidth: 2, stroke: VIZ_SURFACE }}
+          />
+        ))}
+      </LineChart>
+    </Responsive>
   );
 }
 
@@ -228,31 +244,33 @@ export function StackedBars({
   money?: boolean | undefined;
 }) {
   return (
-    <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="28%">
-      <CartesianGrid stroke={VIZ_GRID} vertical={false} />
-      <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
-      <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
-      <Tooltip
-        content={<VizTooltip money={money} />}
-        cursor={{ fill: VIZ_GRID, fillOpacity: 0.4 }}
-        labelFormatter={shortDay}
-      />
-      {series.length > 1 && <Legend {...legendProps} />}
-      {series.map((s, index) => (
-        <Bar
-          key={s.key}
-          dataKey={(row: Record<string, unknown>) => num(row[s.key] as string)}
-          name={s.name}
-          stackId="a"
-          maxBarSize={24}
-          fill={vizColor(index)}
-          // The 2px gap in the surface colour is what separates the segments;
-          // a stroke around each one would add ink that is not data.
-          stroke={VIZ_SURFACE}
-          strokeWidth={2}
+    <Responsive>
+      <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="28%">
+        <CartesianGrid stroke={VIZ_GRID} vertical={false} />
+        <XAxis dataKey="day" tickFormatter={shortDay} minTickGap={24} {...axisProps} />
+        <YAxis tickFormatter={formatCompact} width={52} {...axisProps} />
+        <Tooltip
+          content={<VizTooltip money={money} />}
+          cursor={{ fill: VIZ_GRID, fillOpacity: 0.4 }}
+          labelFormatter={shortDay}
         />
-      ))}
-    </BarChart>
+        {series.length > 1 && <Legend {...legendProps} />}
+        {series.map((s, index) => (
+          <Bar
+            key={s.key}
+            dataKey={(row: Record<string, unknown>) => num(row[s.key] as string)}
+            name={s.name}
+            stackId="a"
+            maxBarSize={24}
+            fill={vizColor(index)}
+            // The 2px gap in the surface colour is what separates the segments;
+            // a stroke around each one would add ink that is not data.
+            stroke={VIZ_SURFACE}
+            strokeWidth={2}
+          />
+        ))}
+      </BarChart>
+    </Responsive>
   );
 }
 
@@ -271,34 +289,36 @@ export function HorizontalBars({
   colorIndex?: number | undefined;
 }) {
   return (
-    <BarChart
-      data={data}
-      layout="vertical"
-      margin={{ top: 4, right: 16, left: 8, bottom: 4 }}
-      barCategoryGap="30%"
-    >
-      <CartesianGrid stroke={VIZ_GRID} horizontal={false} />
-      <XAxis type="number" tickFormatter={formatCompact} {...axisProps} />
-      <YAxis
-        type="category"
-        dataKey={labelKey}
-        width={148}
-        {...axisProps}
-        tick={{ fill: "var(--color-foreground)", fontSize: 12 }}
-      />
-      <Tooltip
-        content={<VizTooltip money={money} />}
-        cursor={{ fill: VIZ_GRID, fillOpacity: 0.4 }}
-      />
-      <Bar
-        dataKey={(row: Record<string, unknown>) => num(row[valueKey] as string)}
-        name={money ? "Savdo" : "Soni"}
-        maxBarSize={20}
-        fill={vizColor(colorIndex)}
-        // Rounded at the data end, square where it meets the baseline.
-        radius={[0, 4, 4, 0]}
-      />
-    </BarChart>
+    <Responsive>
+      <BarChart
+        data={data}
+        layout="vertical"
+        margin={{ top: 4, right: 16, left: 8, bottom: 4 }}
+        barCategoryGap="30%"
+      >
+        <CartesianGrid stroke={VIZ_GRID} horizontal={false} />
+        <XAxis type="number" tickFormatter={formatCompact} {...axisProps} />
+        <YAxis
+          type="category"
+          dataKey={labelKey}
+          width={148}
+          {...axisProps}
+          tick={{ fill: "var(--color-foreground)", fontSize: 12 }}
+        />
+        <Tooltip
+          content={<VizTooltip money={money} />}
+          cursor={{ fill: VIZ_GRID, fillOpacity: 0.4 }}
+        />
+        <Bar
+          dataKey={(row: Record<string, unknown>) => num(row[valueKey] as string)}
+          name={money ? "Savdo" : "Soni"}
+          maxBarSize={20}
+          fill={vizColor(colorIndex)}
+          // Rounded at the data end, square where it meets the baseline.
+          radius={[0, 4, 4, 0]}
+        />
+      </BarChart>
+    </Responsive>
   );
 }
 
@@ -314,24 +334,26 @@ export function DonutChart({
   money?: boolean | undefined;
 }) {
   return (
-    <PieChart>
-      <Tooltip content={<VizTooltip money={money} />} />
-      <Legend {...legendProps} />
-      <Pie
-        data={data}
-        dataKey="value"
-        nameKey="name"
-        innerRadius="58%"
-        outerRadius="82%"
-        paddingAngle={2}
-        stroke={VIZ_SURFACE}
-        strokeWidth={2}
-      >
-        {data.map((entry, index) => (
-          <Cell key={entry.name} fill={vizColor(index)} />
-        ))}
-      </Pie>
-    </PieChart>
+    <Responsive>
+      <PieChart>
+        <Tooltip content={<VizTooltip money={money} />} />
+        <Legend {...legendProps} />
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          innerRadius="58%"
+          outerRadius="82%"
+          paddingAngle={2}
+          stroke={VIZ_SURFACE}
+          strokeWidth={2}
+        >
+          {data.map((entry, index) => (
+            <Cell key={entry.name} fill={vizColor(index)} />
+          ))}
+        </Pie>
+      </PieChart>
+    </Responsive>
   );
 }
 

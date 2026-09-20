@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -17,15 +18,37 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as SellerRouteImport } from './routes/seller'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAdsRouteImport } from './routes/admin.ads'
+import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
+import { Route as AdminSellersRouteImport } from './routes/admin.sellers'
+import { Route as AdminSystemRouteImport } from './routes/admin.system'
 import { Route as GarageIndexRouteImport } from './routes/garage.index'
 import { Route as GarageAddRouteImport } from './routes/garage.add'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
+import { Route as SellerIndexRouteImport } from './routes/seller.index'
+import { Route as SellerAdsRouteImport } from './routes/seller.ads'
+import { Route as SellerFinanceRouteImport } from './routes/seller.finance'
+import { Route as SellerOrdersRouteImport } from './routes/seller.orders'
+import { Route as SellerProductsRouteImport } from './routes/seller.products'
+import { Route as SellerPromotionsRouteImport } from './routes/seller.promotions'
+import { Route as SellerSettingsRouteImport } from './routes/seller.settings'
+import { Route as SellerWarehousesRouteImport } from './routes/seller.warehouses'
+import { Route as SellerOnboardRouteImport } from './routes/seller_.onboard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -63,6 +86,46 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SellerRoute = SellerRouteImport.update({
+  id: '/seller',
+  path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdsRoute = AdminAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFinanceRoute = AdminFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSellersRoute = AdminSellersRouteImport.update({
+  id: '/sellers',
+  path: '/sellers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSystemRoute = AdminSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
+  getParentRoute: () => AdminRoute,
+} as any)
 const GarageIndexRoute = GarageIndexRouteImport.update({
   id: '/garage/',
   path: '/garage/',
@@ -88,9 +151,55 @@ const ProductProductIdRoute = ProductProductIdRouteImport.update({
   path: '/product/$productId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SellerIndexRoute = SellerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerAdsRoute = SellerAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerFinanceRoute = SellerFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerOrdersRoute = SellerOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerProductsRoute = SellerProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerPromotionsRoute = SellerPromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerSettingsRoute = SellerSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerWarehousesRoute = SellerWarehousesRouteImport.update({
+  id: '/warehouses',
+  path: '/warehouses',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerOnboardRoute = SellerOnboardRouteImport.update({
+  id: '/seller_/onboard',
+  path: '/seller/onboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/feed': typeof FeedRoute
@@ -98,11 +207,28 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/seller': typeof SellerRouteWithChildren
+  '/admin/ads': typeof AdminAdsRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/sellers': typeof AdminSellersRoute
+  '/admin/system': typeof AdminSystemRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/seller/ads': typeof SellerAdsRoute
+  '/seller/finance': typeof SellerFinanceRoute
+  '/seller/orders': typeof SellerOrdersRoute
+  '/seller/products': typeof SellerProductsRoute
+  '/seller/promotions': typeof SellerPromotionsRoute
+  '/seller/settings': typeof SellerSettingsRoute
+  '/seller/warehouses': typeof SellerWarehousesRoute
+  '/seller/onboard': typeof SellerOnboardRoute
+  '/admin/': typeof AdminIndexRoute
   '/garage/': typeof GarageIndexRoute
   '/orders/': typeof OrdersIndexRoute
+  '/seller/': typeof SellerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,15 +239,32 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/admin/ads': typeof AdminAdsRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/sellers': typeof AdminSellersRoute
+  '/admin/system': typeof AdminSystemRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/seller/ads': typeof SellerAdsRoute
+  '/seller/finance': typeof SellerFinanceRoute
+  '/seller/orders': typeof SellerOrdersRoute
+  '/seller/products': typeof SellerProductsRoute
+  '/seller/promotions': typeof SellerPromotionsRoute
+  '/seller/settings': typeof SellerSettingsRoute
+  '/seller/warehouses': typeof SellerWarehousesRoute
+  '/seller/onboard': typeof SellerOnboardRoute
+  '/admin': typeof AdminIndexRoute
   '/garage': typeof GarageIndexRoute
   '/orders': typeof OrdersIndexRoute
+  '/seller': typeof SellerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/feed': typeof FeedRoute
@@ -129,16 +272,34 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/seller': typeof SellerRouteWithChildren
+  '/admin/ads': typeof AdminAdsRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/sellers': typeof AdminSellersRoute
+  '/admin/system': typeof AdminSystemRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/seller/ads': typeof SellerAdsRoute
+  '/seller/finance': typeof SellerFinanceRoute
+  '/seller/orders': typeof SellerOrdersRoute
+  '/seller/products': typeof SellerProductsRoute
+  '/seller/promotions': typeof SellerPromotionsRoute
+  '/seller/settings': typeof SellerSettingsRoute
+  '/seller/warehouses': typeof SellerWarehousesRoute
+  '/seller_/onboard': typeof SellerOnboardRoute
+  '/admin/': typeof AdminIndexRoute
   '/garage/': typeof GarageIndexRoute
   '/orders/': typeof OrdersIndexRoute
+  '/seller/': typeof SellerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/cart'
     | '/checkout'
     | '/feed'
@@ -146,11 +307,28 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/profile'
     | '/register'
+    | '/seller'
+    | '/admin/ads'
+    | '/admin/finance'
+    | '/admin/orders'
+    | '/admin/promotions'
+    | '/admin/sellers'
+    | '/admin/system'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/seller/ads'
+    | '/seller/finance'
+    | '/seller/orders'
+    | '/seller/products'
+    | '/seller/promotions'
+    | '/seller/settings'
+    | '/seller/warehouses'
+    | '/seller/onboard'
+    | '/admin/'
     | '/garage/'
     | '/orders/'
+    | '/seller/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,14 +339,31 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/profile'
     | '/register'
+    | '/admin/ads'
+    | '/admin/finance'
+    | '/admin/orders'
+    | '/admin/promotions'
+    | '/admin/sellers'
+    | '/admin/system'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/seller/ads'
+    | '/seller/finance'
+    | '/seller/orders'
+    | '/seller/products'
+    | '/seller/promotions'
+    | '/seller/settings'
+    | '/seller/warehouses'
+    | '/seller/onboard'
+    | '/admin'
     | '/garage'
     | '/orders'
+    | '/seller'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/cart'
     | '/checkout'
     | '/feed'
@@ -176,15 +371,33 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/profile'
     | '/register'
+    | '/seller'
+    | '/admin/ads'
+    | '/admin/finance'
+    | '/admin/orders'
+    | '/admin/promotions'
+    | '/admin/sellers'
+    | '/admin/system'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/seller/ads'
+    | '/seller/finance'
+    | '/seller/orders'
+    | '/seller/products'
+    | '/seller/promotions'
+    | '/seller/settings'
+    | '/seller/warehouses'
+    | '/seller_/onboard'
+    | '/admin/'
     | '/garage/'
     | '/orders/'
+    | '/seller/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   FeedRoute: typeof FeedRoute
@@ -192,9 +405,11 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  SellerRoute: typeof SellerRouteWithChildren
   GarageAddRoute: typeof GarageAddRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
+  SellerOnboardRoute: typeof SellerOnboardRoute
   GarageIndexRoute: typeof GarageIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
 }
@@ -206,6 +421,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -257,6 +479,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seller': {
+      id: '/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ads': {
+      id: '/admin/ads'
+      path: '/ads'
+      fullPath: '/admin/ads'
+      preLoaderRoute: typeof AdminAdsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/finance': {
+      id: '/admin/finance'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AdminFinanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/promotions': {
+      id: '/admin/promotions'
+      path: '/promotions'
+      fullPath: '/admin/promotions'
+      preLoaderRoute: typeof AdminPromotionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sellers': {
+      id: '/admin/sellers'
+      path: '/sellers'
+      fullPath: '/admin/sellers'
+      preLoaderRoute: typeof AdminSellersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/system': {
+      id: '/admin/system'
+      path: '/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AdminSystemRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/garage/': {
       id: '/garage/'
       path: '/garage'
@@ -292,11 +570,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seller/': {
+      id: '/seller/'
+      path: '/'
+      fullPath: '/seller/'
+      preLoaderRoute: typeof SellerIndexRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/ads': {
+      id: '/seller/ads'
+      path: '/ads'
+      fullPath: '/seller/ads'
+      preLoaderRoute: typeof SellerAdsRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/finance': {
+      id: '/seller/finance'
+      path: '/finance'
+      fullPath: '/seller/finance'
+      preLoaderRoute: typeof SellerFinanceRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/orders': {
+      id: '/seller/orders'
+      path: '/orders'
+      fullPath: '/seller/orders'
+      preLoaderRoute: typeof SellerOrdersRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/products': {
+      id: '/seller/products'
+      path: '/products'
+      fullPath: '/seller/products'
+      preLoaderRoute: typeof SellerProductsRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/promotions': {
+      id: '/seller/promotions'
+      path: '/promotions'
+      fullPath: '/seller/promotions'
+      preLoaderRoute: typeof SellerPromotionsRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/settings': {
+      id: '/seller/settings'
+      path: '/settings'
+      fullPath: '/seller/settings'
+      preLoaderRoute: typeof SellerSettingsRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/warehouses': {
+      id: '/seller/warehouses'
+      path: '/warehouses'
+      fullPath: '/seller/warehouses'
+      preLoaderRoute: typeof SellerWarehousesRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller_/onboard': {
+      id: '/seller_/onboard'
+      path: '/seller/onboard'
+      fullPath: '/seller/onboard'
+      preLoaderRoute: typeof SellerOnboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminAdsRoute: typeof AdminAdsRoute
+  AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminPromotionsRoute: typeof AdminPromotionsRoute
+  AdminSellersRoute: typeof AdminSellersRoute
+  AdminSystemRoute: typeof AdminSystemRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdsRoute: AdminAdsRoute,
+  AdminFinanceRoute: AdminFinanceRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminPromotionsRoute: AdminPromotionsRoute,
+  AdminSellersRoute: AdminSellersRoute,
+  AdminSystemRoute: AdminSystemRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface SellerRouteChildren {
+  SellerAdsRoute: typeof SellerAdsRoute
+  SellerFinanceRoute: typeof SellerFinanceRoute
+  SellerOrdersRoute: typeof SellerOrdersRoute
+  SellerProductsRoute: typeof SellerProductsRoute
+  SellerPromotionsRoute: typeof SellerPromotionsRoute
+  SellerSettingsRoute: typeof SellerSettingsRoute
+  SellerWarehousesRoute: typeof SellerWarehousesRoute
+  SellerIndexRoute: typeof SellerIndexRoute
+}
+
+const SellerRouteChildren: SellerRouteChildren = {
+  SellerAdsRoute: SellerAdsRoute,
+  SellerFinanceRoute: SellerFinanceRoute,
+  SellerOrdersRoute: SellerOrdersRoute,
+  SellerProductsRoute: SellerProductsRoute,
+  SellerPromotionsRoute: SellerPromotionsRoute,
+  SellerSettingsRoute: SellerSettingsRoute,
+  SellerWarehousesRoute: SellerWarehousesRoute,
+  SellerIndexRoute: SellerIndexRoute,
+}
+
+const SellerRouteWithChildren =
+  SellerRoute._addFileChildren(SellerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   FeedRoute: FeedRoute,
@@ -304,9 +693,11 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  SellerRoute: SellerRouteWithChildren,
   GarageAddRoute: GarageAddRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductProductIdRoute: ProductProductIdRoute,
+  SellerOnboardRoute: SellerOnboardRoute,
   GarageIndexRoute: GarageIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
 }

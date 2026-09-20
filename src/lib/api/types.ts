@@ -95,6 +95,12 @@ export type AdCampaignStatus = S["AdCampaignStatus"];
 export type AdEventKind = S["AdEventKind"];
 
 export type SellerOnboardIn = S["SellerOnboardIn"];
+export type SellerOfferRow = S["SellerOfferRow"];
+export type OfferUpsertIn = S["OfferUpsertIn"];
+export type ProductCreateIn = S["ProductCreateIn"];
+export type ProductUpdateIn = S["ProductUpdateIn"];
+export type OfferStatus = S["OfferStatus"];
+export type ProductCondition = S["ProductCondition"];
 export type SellerUpdateIn = S["SellerUpdateIn"];
 export type AppliedPromotionOut = S["AppliedPromotionOut"];
 

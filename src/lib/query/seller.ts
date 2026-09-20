@@ -21,14 +21,18 @@ import type {
   LedgerEntryOut,
   MovementOut,
   MoneyFlowDay,
+  OfferUpsertIn,
   PayoutOut,
   PayoutRequestIn,
   PlacementOut,
   PromotionIn,
   PromotionOut,
+  ProductCreateIn,
+  ProductUpdateIn,
   PromotionUpdateIn,
   RedemptionOut,
   SalesDay,
+  SellerOfferRow,
   SellerOnboardIn,
   SellerOut,
   SellerOverview,
@@ -424,6 +428,51 @@ export function useDeleteCreative(sellerId: string) {
   return useMutation({
     mutationFn: (creativeId: string) =>
       safeApi<void>(`/seller/${sellerId}/ads/creatives/${creativeId}`, { method: "DELETE" }),
+    onSuccess: invalidate,
+  });
+}
+
+/* --- catalogue ------------------------------------------------------------------ */
+export function useSellerOffers(sellerId: string) {
+  return useQuery({
+    queryKey: qk.sellerOffers(sellerId),
+    queryFn: () => safeApi<SellerOfferRow[]>(`/seller/${sellerId}/offers`),
+    enabled: Boolean(sellerId),
+  });
+}
+
+export function useUpsertOffer(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (input: OfferUpsertIn) =>
+      safeApi<{ id: string; price: string; stock: number; status: string }>(
+        `/seller/${sellerId}/offers`,
+        { method: "PUT", body: input },
+      ),
+    onSuccess: invalidate,
+  });
+}
+
+export function useCreateProduct(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (input: ProductCreateIn) =>
+      safeApi<{ id: string; slug: string; status: string }>(`/seller/${sellerId}/products`, {
+        method: "POST",
+        body: input,
+      }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useUpdateProduct(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: ({ productId, ...body }: ProductUpdateIn & { productId: string }) =>
+      safeApi<{ id: string; slug: string }>(`/seller/products/${productId}`, {
+        method: "PATCH",
+        body,
+      }),
     onSuccess: invalidate,
   });
 }

@@ -864,7 +864,8 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** Do'kondagi mahsulotlar */
+    get: operations["seller_offers_api_v1_seller__seller_id__offers_get"];
     /** Narx va qoldiqni belgilash */
     put: operations["upsert_offer_api_v1_seller__seller_id__offers_put"];
     post?: never;
@@ -3624,6 +3625,54 @@ export interface components {
       /** Verification Level */
       verification_level: string;
     };
+    /**
+     * SellerOfferRow
+     * @description One line on the seller's product list: the offer plus enough of the
+     *     product to recognise it. Cost price is not here — that belongs to the
+     *     warehouse screens, where it is per branch.
+     */
+    SellerOfferRow: {
+      /**
+       * Offer Id
+       * Format: uuid
+       */
+      offer_id: string;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Product Name */
+      product_name: string;
+      /** Product Slug */
+      product_slug: string;
+      /** Image Url */
+      image_url?: string | null;
+      /** Oem Number */
+      oem_number?: string | null;
+      /** Category Name */
+      category_name?: string | null;
+      /** Brand Name */
+      brand_name?: string | null;
+      /** Price */
+      price: string;
+      /** Old Price */
+      old_price?: string | null;
+      /** Stock */
+      stock: number;
+      /** Reserved */
+      reserved: number;
+      /** Available */
+      available: number;
+      status: components["schemas"]["OfferStatus"];
+      condition: components["schemas"]["ProductCondition"];
+      product_status: components["schemas"]["ProductStatus"];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
     /** SellerOnboardIn */
     SellerOnboardIn: {
       /** Store Name */
@@ -5705,6 +5754,37 @@ export interface operations {
           "application/json": {
             [key: string]: unknown;
           };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seller_offers_api_v1_seller__seller_id__offers_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        seller_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SellerOfferRow"][];
         };
       };
       /** @description Validation Error */

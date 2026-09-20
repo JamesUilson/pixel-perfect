@@ -11,7 +11,7 @@ import { useIsAuthenticated } from "@/lib/query/session";
 import type { DeliveryMethod, PaymentMethod } from "@/lib/api/types";
 import { formatSom } from "@/lib/format";
 import { useT } from "@/lib/i18n";
-import { useCart, useCheckout } from "@/lib/query/commerce";
+import { useAppliedPromoCode, useCart, useCheckout } from "@/lib/query/commerce";
 import { useMe } from "@/lib/query/auth";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,10 @@ type FormErrors = Partial<Record<string, string>>;
 function Checkout() {
   const t = useT();
   const navigate = useNavigate();
-  const cart = useCart();
+  // The cart is re-read with the code the buyer applied there, so the total on
+  // this page is the total the server will charge — never the undiscounted one.
+  const promoCode = useAppliedPromoCode();
+  const cart = useCart(promoCode);
   const me = useMe();
   const checkout = useCheckout();
   const signedIn = useIsAuthenticated();
@@ -88,6 +91,7 @@ function Checkout() {
         payment_method: payment,
         delivery_method: delivery,
         comment: form.comment.trim() || null,
+        promo_code: promoCode,
         return_url: null,
       },
       {
@@ -300,11 +304,37 @@ function Checkout() {
               </li>
             ))}
           </ul>
+          {cart.data.applied_promotions.length > 0 && (
+            <ul className="mt-5 space-y-2 border-t border-border pt-5 text-sm">
+              {cart.data.applied_promotions.map((promo) => (
+                <li key={promo.promotion_id} className="flex items-start justify-between gap-3">
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{promo.title}</span>
+                    {promo.code && <span className="type-caption">{promo.code}</span>}
+                  </span>
+                  <span className="shrink-0 font-semibold text-success">
+                    {promo.kind === "FREE_DELIVERY"
+                      ? "Bepul yetkazish"
+                      : `− ${formatSom(promo.amount)}`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
           <dl className="mt-5 space-y-2 border-t border-border pt-5 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">{t("cart.subtotal")}</dt>
               <dd className="font-semibold">{formatSom(cart.data.subtotal)}</dd>
             </div>
+            {Number(cart.data.discount_total) !== 0 && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Chegirma</dt>
+                <dd className="font-semibold text-success">
+                  − {formatSom(Math.abs(Number(cart.data.discount_total)))}
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-muted-foreground">{t("cart.deliveryTotal")}</dt>
               <dd className="font-semibold">

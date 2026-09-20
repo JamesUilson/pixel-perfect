@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSyncExternalStore } from "react";
 
 import { safeApi } from "@/lib/api/client";
 import { useIsAuthenticated } from "./session";
@@ -33,7 +34,49 @@ export function useCart(promoCode?: string | null) {
     queryFn: () => safeApi<CartOut>("/cart", { query: { promo_code: promoCode } }),
     // Prices and stock are re-checked server-side on every read; do not cache long.
     staleTime: 10_000,
+    // Applying a code is a different cache key. Without this the whole cart
+    // would blink back to a skeleton on every attempt; with it the old prices
+    // stay put for the moment it takes, flagged by `isPlaceholderData`.
+    placeholderData: keepPreviousData,
   });
+}
+
+/* --- the applied promo code ------------------------------------------------
+ *
+ * The cart owns the code as component state, but checkout has to charge what
+ * the cart showed, so the code has to survive the hop between the two routes.
+ * A tiny module-level store does that.
+ *
+ * Deliberately not persisted: losing the code on a refresh is a mild annoyance
+ * the buyer fixes by retyping it, whereas a stale code silently outliving the
+ * cart that priced it is how someone gets charged full price after being shown
+ * a discount. Checkout re-reads the cart with whatever is here, so the total it
+ * shows is always the total the server will charge.
+ * --------------------------------------------------------------------------- */
+let appliedPromoCode: string | null = null;
+const promoListeners = new Set<() => void>();
+
+export function getAppliedPromoCode(): string | null {
+  return appliedPromoCode;
+}
+
+export function setAppliedPromoCode(code: string | null): void {
+  const next = code?.trim() ? code.trim() : null;
+  if (next === appliedPromoCode) return;
+  appliedPromoCode = next;
+  promoListeners.forEach((listener) => listener());
+}
+
+function subscribeToPromoCode(listener: () => void): () => void {
+  promoListeners.add(listener);
+  return () => {
+    promoListeners.delete(listener);
+  };
+}
+
+/** Null on the server and on the first client render, so hydration matches. */
+export function useAppliedPromoCode(): string | null {
+  return useSyncExternalStore(subscribeToPromoCode, getAppliedPromoCode, () => null);
 }
 
 export function useAddToCart() {

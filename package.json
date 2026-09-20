@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "e2e": "node e2e/journey.mjs"
+    "e2e": "node e2e/journey.mjs",
+    "e2e:panels": "node e2e/panels.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"
