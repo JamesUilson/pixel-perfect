@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { AccountMenu } from "./AccountMenu";
 import { useLang, useT } from "@/lib/i18n";
-import { useMe } from "@/lib/query/auth";
 import { useCart } from "@/lib/query/commerce";
 import { useActiveVehicle } from "@/lib/query/garage";
 import { cn } from "@/lib/utils";
@@ -86,7 +86,6 @@ function SearchField({ className }: { className?: string }) {
 export function TopBar() {
   const t = useT();
   const cart = useCart();
-  const me = useMe();
   const { activeVehicle } = useActiveVehicle();
 
   const itemCount = cart.data?.item_count ?? 0;
@@ -151,13 +150,12 @@ export function TopBar() {
           >
             <Receipt className="size-4" />
           </Link>
-          <Link
-            to="/profile"
-            className="hidden size-11 place-items-center border border-border lg:grid"
-            aria-label={me.data ? t("nav.profile") : t("auth.login")}
-          >
-            <UserRound className="size-4" />
-          </Link>
+          {/*
+           * Not a bare link to /profile: someone who runs a store or the
+           * platform reaches their own back office from here, so they never
+           * have to know the address.
+           */}
+          <AccountMenu />
         </div>
       </div>
 
