@@ -19,6 +19,7 @@ import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdsRouteImport } from './routes/admin.ads'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
@@ -89,6 +90,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/seller': typeof SellerRouteWithChildren
+  '/wallet': typeof WalletRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/wallet': typeof WalletRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/seller': typeof SellerRouteWithChildren
+  '/wallet': typeof WalletRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/seller'
+    | '/wallet'
     | '/admin/ads'
     | '/admin/finance'
     | '/admin/orders'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/profile'
     | '/register'
+    | '/wallet'
     | '/admin/ads'
     | '/admin/finance'
     | '/admin/orders'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/seller'
+    | '/wallet'
     | '/admin/ads'
     | '/admin/finance'
     | '/admin/orders'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   SellerRoute: typeof SellerRouteWithChildren
+  WalletRoute: typeof WalletRoute
   GarageAddRoute: typeof GarageAddRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
@@ -484,6 +497,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -694,6 +714,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   SellerRoute: SellerRouteWithChildren,
+  WalletRoute: WalletRoute,
   GarageAddRoute: GarageAddRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductProductIdRoute: ProductProductIdRoute,

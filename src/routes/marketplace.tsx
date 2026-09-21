@@ -61,8 +61,11 @@ function Marketplace() {
     size: 24,
   });
 
+  // ``prev`` is annotated rather than inferred: the router's generated search
+  // type for this route is a union once other routes register their own, and
+  // the inferred parameter lands as implicit any under `noImplicitAny`.
   const setSearch = (patch: Partial<Search>) =>
-    void navigate({ search: (prev) => ({ ...prev, ...patch, page: undefined }) });
+    void navigate({ search: (prev: Search) => ({ ...prev, ...patch, page: undefined }) });
 
   const sortLabels: Record<Sort, string> = {
     relevance: t("market.sortRelevance"),
@@ -219,7 +222,9 @@ function Marketplace() {
                 <button
                   key={n}
                   type="button"
-                  onClick={() => void navigate({ search: (prev) => ({ ...prev, page: n }) })}
+                  onClick={() =>
+                    void navigate({ search: (prev: Search) => ({ ...prev, page: n }) })
+                  }
                   aria-current={n === products.data.page ? "page" : undefined}
                   className={cn(
                     "min-w-10 border px-3 py-2 text-sm font-semibold transition-colors",

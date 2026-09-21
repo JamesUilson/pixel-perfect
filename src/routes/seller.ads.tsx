@@ -7,12 +7,20 @@
  * a card shows at a glance. The numbers live one click deeper, in the two charts
  * a selected campaign opens — impressions and clicks together on one scale, and
  * spend on its own, because som and counts are not the same magnitude.
+ *
+ * Creating one is a stepped flow rather than a form, and it lives in
+ * `components/avtoqism/ads/CampaignWizard.tsx`. The reason is the money: the old
+ * form asked for a budget and a date range before the seller had seen what they
+ * were buying or what it would look like on the page. The wizard asks in the
+ * order the decisions are actually made and puts the whole thing on one screen
+ * before anything is created.
  */
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 
 import { EmptyState } from "@/components/avtoqism/Page";
+import { CampaignWizard } from "@/components/avtoqism/ads/CampaignWizard";
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
 import { ChartCard, Meter, MultiLine, RevenueArea, num } from "@/components/avtoqism/panel/Charts";
 import { PanelSection, PanelToolbar } from "@/components/avtoqism/panel/PanelShell";
@@ -24,7 +32,6 @@ import {
   Input,
   Panel,
   Pill,
-  Select,
 } from "@/components/avtoqism/panel/Widgets";
 import type { AdCampaignStatus, CampaignOut, PlacementOut } from "@/lib/api/types";
 import { formatDate, formatSom, groupDigits } from "@/lib/format";
@@ -34,7 +41,6 @@ import {
   useCampaignDaily,
   useCampaigns,
   useCampaignStatus,
-  useCreateCampaign,
   useDeleteCreative,
   usePlacements,
 } from "@/lib/query/seller";
@@ -68,23 +74,6 @@ const NEXT_STATUS: Record<string, { status: AdCampaignStatus; label: string } | 
   PAUSED: { status: "ACTIVE", label: "Davom ettirish" },
   REJECTED: { status: "DRAFT", label: "Qayta tahrirlash" },
 };
-
-const PRICING_UZ: Record<string, string> = {
-  CPM: "1000 ko'rish uchun",
-  CPC: "har bir bosish uchun",
-  FLAT: "kunlik",
-};
-
-function placementPrice(placement: PlacementOut): string {
-  const raw =
-    placement.pricing_model === "CPM"
-      ? placement.price_cpm
-      : placement.pricing_model === "CPC"
-        ? placement.price_cpc
-        : placement.price_flat_daily;
-  if (raw == null) return "narx kelishiladi";
-  return `${formatSom(raw)} ${PRICING_UZ[placement.pricing_model] ?? ""}`.trim();
-}
 
 function ctrLabel(campaign: CampaignOut): string {
   if (campaign.impressions === 0) return "—";
@@ -121,7 +110,7 @@ function SellerAds() {
   return (
     <div className="space-y-6">
       <PanelToolbar>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button onClick={() => setCreateOpen(true)} disabled={createOpen}>
           <Plus className="size-4" aria-hidden />
           Kampaniya yaratish
         </Button>
@@ -129,6 +118,33 @@ function SellerAds() {
           <ExportButton path={`/export/seller/${sellerId}/campaigns`} />
         </span>
       </PanelToolbar>
+
+      {/*
+       * Full width rather than a dialog: five steps, a live preview and a review
+       * table do not fit in a phone-sized modal, and a wizard that has to scroll
+       * inside a box is how people lose track of which step they are on. The
+       * list below stays exactly where it was.
+       */}
+      {createOpen && (
+        <PanelSection
+          title="Yangi kampaniya"
+          subtitle="Besh qadam: maqsad, ko'rinish, auditoriya, jadval va tekshirish."
+          action={
+            <Button variant="ghost" size="sm" onClick={() => setCreateOpen(false)}>
+              Yopish
+            </Button>
+          }
+        >
+          <div className="p-5">
+            <CampaignWizard
+              sellerId={sellerId}
+              placements={placements.data ?? []}
+              placementsPending={placements.isPending}
+              onDone={() => setCreateOpen(false)}
+            />
+          </div>
+        </PanelSection>
+      )}
 
       {campaigns.isPending ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -177,17 +193,6 @@ function SellerAds() {
       )}
 
       {selected && <CampaignCharts sellerId={sellerId} campaign={selected} />}
-
-      <Panel open={createOpen} title="Yangi kampaniya" onClose={() => setCreateOpen(false)}>
-        {createOpen && (
-          <CampaignForm
-            sellerId={sellerId}
-            placements={placements.data ?? []}
-            placementsPending={placements.isPending}
-            onDone={() => setCreateOpen(false)}
-          />
-        )}
-      </Panel>
 
       <Panel
         open={creativeFor !== null}
@@ -362,156 +367,6 @@ function CampaignCharts({ sellerId, campaign }: { sellerId: string; campaign: Ca
         <RevenueArea data={rows} valueKey="spend" name="Sarf" />
       </ChartCard>
     </div>
-  );
-}
-
-/* --- create ------------------------------------------------------------------------ */
-function CampaignForm({
-  sellerId,
-  placements,
-  placementsPending,
-  onDone,
-}: {
-  sellerId: string;
-  placements: PlacementOut[];
-  placementsPending: boolean;
-  onDone: () => void;
-}) {
-  const create = useCreateCampaign(sellerId);
-  const usable = placements.filter((placement) => placement.is_active);
-
-  const [placementId, setPlacementId] = useState(() => usable[0]?.id ?? "");
-  const [title, setTitle] = useState("");
-  const [budget, setBudget] = useState("");
-  const [dailyCap, setDailyCap] = useState("");
-  const [startsAt, setStartsAt] = useState("");
-  const [endsAt, setEndsAt] = useState("");
-
-  const placement = usable.find((option) => option.id === placementId) ?? null;
-  const minBudget = placement ? num(placement.min_budget) : 0;
-  const budgetValue = Number(budget);
-  const budgetTooLow = Number.isFinite(budgetValue) && budgetValue > 0 && budgetValue < minBudget;
-
-  const valid =
-    placementId !== "" &&
-    title.trim() !== "" &&
-    Number.isFinite(budgetValue) &&
-    budgetValue >= minBudget &&
-    budgetValue > 0 &&
-    startsAt !== "" &&
-    endsAt !== "";
-
-  function submit(event: React.FormEvent) {
-    event.preventDefault();
-    if (!valid) return;
-    create.mutate(
-      {
-        placement_id: placementId,
-        title: title.trim(),
-        budget: budgetValue,
-        daily_cap: dailyCap.trim() === "" ? null : Number(dailyCap),
-        starts_at: new Date(startsAt).toISOString(),
-        ends_at: new Date(endsAt).toISOString(),
-      },
-      { onSuccess: onDone },
-    );
-  }
-
-  if (placementsPending) return <LineSkeleton className="h-40 w-full" />;
-
-  if (usable.length === 0) {
-    return (
-      <p className="type-caption">Hozircha bo'sh reklama o'rni yo'q. Keyinroq urinib ko'ring.</p>
-    );
-  }
-
-  return (
-    <form className="space-y-4" onSubmit={submit}>
-      <Field
-        label="O'rin"
-        hint={
-          placement
-            ? `${placementPrice(placement)} · eng kam byudjet ${formatSom(placement.min_budget)}`
-            : undefined
-        }
-      >
-        <Select value={placementId} onChange={(event) => setPlacementId(event.target.value)}>
-          {usable.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name_uz} — {placementPrice(option)}
-            </option>
-          ))}
-        </Select>
-      </Field>
-
-      <Field label="Nomi" hint="Faqat siz ko'rasiz — kampaniyani ajratish uchun.">
-        <Input
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          maxLength={120}
-          required
-        />
-      </Field>
-
-      <Field
-        label="Byudjet"
-        hint={`Eng kam ${formatSom(minBudget)}.`}
-        error={
-          budgetTooLow ? `Byudjet ${formatSom(minBudget)} dan kam bo'lmasligi kerak.` : undefined
-        }
-      >
-        <Input
-          type="number"
-          min={minBudget}
-          step={1000}
-          inputMode="numeric"
-          value={budget}
-          onChange={(event) => setBudget(event.target.value)}
-          required
-        />
-      </Field>
-
-      <Field label="Kunlik cheklov" hint="Ixtiyoriy. Bir kunda sarflanadigan eng ko'p summa.">
-        <Input
-          type="number"
-          min={0}
-          step={1000}
-          inputMode="numeric"
-          value={dailyCap}
-          onChange={(event) => setDailyCap(event.target.value)}
-        />
-      </Field>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Boshlanish">
-          <Input
-            type="datetime-local"
-            value={startsAt}
-            onChange={(event) => setStartsAt(event.target.value)}
-            required
-          />
-        </Field>
-        <Field label="Tugash">
-          <Input
-            type="datetime-local"
-            value={endsAt}
-            onChange={(event) => setEndsAt(event.target.value)}
-            required
-          />
-        </Field>
-      </div>
-
-      {create.isError && <p className="text-sm text-destructive">{create.error.message}</p>}
-
-      <div className="flex gap-2">
-        <Button type="submit" disabled={!valid || create.isPending}>
-          {create.isPending ? "Saqlanmoqda…" : "Yaratish"}
-        </Button>
-        <Button type="button" variant="ghost" onClick={onDone}>
-          Bekor qilish
-        </Button>
-      </div>
-    </form>
   );
 }
 

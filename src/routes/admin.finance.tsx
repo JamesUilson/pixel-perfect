@@ -17,6 +17,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, CheckCircle2, Plus, Trash2 } from "lucide-react";
 
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
+import { PayoutApprovals } from "@/components/avtoqism/admin/PayoutApprovals";
 import { num } from "@/components/avtoqism/panel/Charts";
 import { PanelSection } from "@/components/avtoqism/panel/PanelShell";
 import {
@@ -152,6 +153,7 @@ function AdminFinance() {
       <IntegrityStrip />
       <AccountsSection />
       <PaymentGatewaysSection lang={lang} />
+      <PayoutApprovals lang={lang} />
       <PayoutQueue sellers={sellers.data} lang={lang} />
       <CommissionRulesSection sellers={sellers.data} />
       <LedgerExplorer sellers={sellers.data} lang={lang} />
@@ -603,13 +605,15 @@ function PayoutQueue({ sellers, lang }: { sellers: SellerOut[] | undefined; lang
 
   return (
     <PanelSection
-      title="To'lov so'rovlari"
-      subtitle="Sotuvchilar yechmoqchi bo'lgan pul. Har bir qator bitta bank o'tkazmasi."
+      title="To'lovlar reyestri"
+      subtitle="Barcha to'lov so'rovlari va ularning bosqichma-bosqich holati."
       action={<ExportButton path="/export/admin/payouts" />}
     >
       <p className="border-b border-warning/40 bg-warning/10 px-5 py-3 text-sm">
-        «To'landi» tugmasi pulni hisobdan chiqaradi — uni faqat o'tkazma haqiqatan ham amalga
-        oshirilgandan keyin bosing.
+        Odatdagi qaror yuqoridagi «To'lov so'rovlarini tasdiqlash» bo'limida qabul qilinadi. Bu
+        yerdagi tugmalar holatni bosqichma-bosqich siljitadi — masalan, o'tkazma bankda osilib
+        qolganda «Xatolik» deb belgilash uchun. «To'landi» pulni hisobdan chiqaradi; uni faqat
+        o'tkazma haqiqatan ham amalga oshirilgandan keyin bosing.
       </p>
 
       {decide.isError && (

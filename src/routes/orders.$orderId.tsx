@@ -6,8 +6,10 @@ import { OrderStatusPill } from "@/components/avtoqism/OrderStatusPill";
 import { Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
+import { DeliveryAddressCard } from "@/components/avtoqism/delivery/DeliveryAddressCard";
+import { DeliveryProgress } from "@/components/avtoqism/delivery/DeliveryProgress";
 import { useIsAuthenticated } from "@/lib/query/session";
-import { formatDateTime, formatPhone, formatSom } from "@/lib/format";
+import { formatDateTime, formatSom } from "@/lib/format";
 import { useLang, useT } from "@/lib/i18n";
 import { useCancelOrder, useOrder } from "@/lib/query/commerce";
 
@@ -46,7 +48,21 @@ function OrderDetail() {
   }
 
   const data = order.data;
-  const address = data.address_snapshot as Record<string, string>;
+  // Only a fallback: an order placed before the server formatted the line for
+  // everyone still has to render somewhere sensible.
+  const snapshot = data.address_snapshot as Record<string, string | null | undefined>;
+  const fallbackLine = [
+    snapshot["region"],
+    snapshot["district"],
+    snapshot["street"],
+    snapshot["house"] ? `${snapshot["house"]}-uy` : null,
+    snapshot["entrance"] ? `${snapshot["entrance"]}-podyezd` : null,
+    snapshot["floor"] ? `${snapshot["floor"]}-qavat` : null,
+    snapshot["apartment"] ? `${snapshot["apartment"]}-xonadon` : null,
+    snapshot["landmark"],
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <Page>
@@ -82,6 +98,8 @@ function OrderDetail() {
 
       <div className="grid items-start gap-8 lg:grid-cols-[1.6fr_0.8fr]">
         <div className="space-y-8">
+          {data.delivery && <DeliveryProgress timeline={data.delivery} lang={lang} />}
+
           {data.sub_orders.map((sub) => (
             <section key={sub.id} className="border border-border bg-card">
               <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
@@ -180,16 +198,14 @@ function OrderDetail() {
             </div>
           </div>
 
-          <div className="border border-border bg-card p-6">
-            <h2 className="type-h3">{t("checkout.address")}</h2>
-            <p className="mt-4 text-sm font-semibold">{data.recipient_name}</p>
-            <p className="type-caption">{formatPhone(data.recipient_phone)}</p>
-            <p className="type-caption mt-2">
-              {[address["region"], address["district"], address["street"], address["landmark"]]
-                .filter(Boolean)
-                .join(", ")}
-            </p>
-          </div>
+          <DeliveryAddressCard
+            address={data.delivery_address}
+            line={fallbackLine}
+            recipientName={data.recipient_name}
+            recipientPhone={data.recipient_phone}
+            contactIsSelf={data.contact_is_self ?? true}
+            title={t("checkout.address")}
+          />
 
           {CANCELLABLE.has(data.status) && (
             <button

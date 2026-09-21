@@ -89,4 +89,43 @@ export const qk = {
   /* --- storefront -------------------------------------------------------- */
   adSlot: (slot: string, params: Record<string, unknown>) => ["ads", slot, params] as const,
   purchaseSummary: ["me", "purchase-summary"] as const,
+
+  /* --- uploads ------------------------------------------------------------
+   * The API lists a person's files, not a store's, so the cache is keyed by
+   * the uploader. Screens that want one store's files filter the same list.
+   */
+  myUploads: ["uploads", "mine"] as const,
+
+  /* --- saved delivery addresses ------------------------------------------- */
+  addresses: ["me", "addresses"] as const,
+
+  /* --- the buyer's own balance ---------------------------------------------
+   * Under "me" like everything else that belongs to the signed-in person, so
+   * one predicate drops all of it when the session ends.
+   */
+  wallet: ["me", "wallet"] as const,
+  walletCards: ["me", "wallet", "cards"] as const,
+  walletTransactions: (page: number) => ["me", "wallet", "transactions", page] as const,
+
+  /* --- admin: review queues, receipts, logs -------------------------------
+   * Appended after the blocks above rather than merged into them: these keys
+   * all begin with "admin", so the panel-wide invalidator (`qk.admin`) still
+   * reaches every one of them.
+   */
+  adminStoreQueue: (status?: string | null) => ["admin", "stores", status ?? null] as const,
+  adminStore: (sellerId: string) => ["admin", "store", sellerId] as const,
+  adminUpload: (fileId: string) => ["admin", "upload", fileId] as const,
+
+  adminPayoutQueue: (filters: Record<string, unknown>) =>
+    ["admin", "payout-queue", filters] as const,
+
+  adminReceipts: ["admin", "receipts"] as const,
+  adminOrderReceipt: (orderId: string) => ["admin", "receipt", orderId] as const,
+
+  adminHealth: ["admin", "health"] as const,
+  adminRequestLogs: (filters: Record<string, unknown>) =>
+    ["admin", "logs", "requests", filters] as const,
+  adminRequestLog: (logId: string) => ["admin", "logs", "request", logId] as const,
+  adminAuditLogs: (filters: Record<string, unknown>) =>
+    ["admin", "logs", "audit", filters] as const,
 } as const;

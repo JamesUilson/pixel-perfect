@@ -8,6 +8,8 @@ import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
 import { StatTile, num } from "@/components/avtoqism/panel/Charts";
 import { ExportButton } from "@/components/avtoqism/panel/Widgets";
+import { VerificationPrompt } from "@/components/avtoqism/auth/VerificationPrompt";
+import { AddressBook } from "@/components/avtoqism/delivery/AddressBook";
 import { useIsAuthenticated } from "@/lib/query/session";
 import type { OrderOut, OrderStatus } from "@/lib/api/types";
 import { formatDate, formatPhone, formatSom, groupDigits } from "@/lib/format";
@@ -120,6 +122,10 @@ function Profile() {
         subtitle={user ? formatPhone(user.phone) || user.email || undefined : undefined}
       />
 
+      {/* Nothing is rendered for a verified account. Unverified buyers are sent
+          here by checkout, so this is where the code has to be enterable. */}
+      <VerificationPrompt user={user} onVerified={() => void me.refetch()} className="mt-6" />
+
       {activeVehicle && (
         <Link
           to="/garage"
@@ -224,6 +230,11 @@ function Profile() {
             )}
           </>
         )}
+      </section>
+
+      {/* --- saved delivery addresses ---------------------------------------- */}
+      <section className="mt-12">
+        <AddressBook />
       </section>
 
       <section className="mt-12">

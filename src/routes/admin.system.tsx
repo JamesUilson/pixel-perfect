@@ -1,21 +1,29 @@
 /**
- * Tizim — is the platform healthy, and can I get the data out?
+ * Tizim — is the platform healthy, what happened, and can I get the data out?
  *
- * Two jobs. The first is the ledger integrity check, repeated here from the
- * finance screen because this is the page someone opens when they suspect
- * something is wrong, and the answer should not require knowing which tab it
- * lives on. The second is every Excel export in one place: if the panel ever
- * fails, the numbers can still leave the building.
+ * The order is the order of the questions. Health first, because "is it up and
+ * is the schema the one the code expects" is what gets asked before anything
+ * else. Then the ledger integrity check, repeated here from the finance screen
+ * because this is the page someone opens when they suspect something is wrong
+ * and the answer should not require knowing which tab it lives on. Then the
+ * logs — what the API actually did, and what changed in the data. Then the
+ * counts, and finally every Excel export in one place: if the panel ever fails,
+ * the numbers can still leave the building.
  */
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
+import { AuditLogPanel } from "@/components/avtoqism/admin/AuditLogPanel";
+import { LogPurgeCard } from "@/components/avtoqism/admin/LogPurgeCard";
+import { RequestLogPanel } from "@/components/avtoqism/admin/RequestLogPanel";
+import { SystemHealthPanel } from "@/components/avtoqism/admin/SystemHealthPanel";
 import { num } from "@/components/avtoqism/panel/Charts";
 import { PanelSection } from "@/components/avtoqism/panel/PanelShell";
 import { Cell, DataTable, ExportButton, Row } from "@/components/avtoqism/panel/Widgets";
 import { formatSom, groupDigits } from "@/lib/format";
+import { useLang } from "@/lib/i18n";
 import {
   useAdminCampaigns,
   useAdminSellers,
@@ -42,9 +50,14 @@ const EXPORTS: { path: string; label: string; hint: string }[] = [
 ];
 
 function AdminSystem() {
+  const { lang } = useLang();
   return (
     <div className="space-y-6">
+      <SystemHealthPanel lang={lang} />
       <IntegrityCheck />
+      <RequestLogPanel lang={lang} />
+      <AuditLogPanel lang={lang} />
+      <LogPurgeCard />
       <CountsSection />
       <InventorySection />
       <ExportsSection />

@@ -1,17 +1,22 @@
 /**
  * Sotuvchilar — every store on the platform, with what it actually sells.
  *
- * The registry on its own answers "who is here"; it does not answer "who
- * matters". So the sales figures for the chosen period are joined onto each
- * row by seller id, and a store with no sales in the period shows a dash rather
- * than being hidden — a registered, silent shop is exactly the thing an admin
- * wants to notice.
+ * The screen has two halves. The review queue on top is where a store's right
+ * to sell is granted, refused, taken away or given back; it carries the papers
+ * with the row so a decision does not require opening four other screens.
+ *
+ * The registry below answers "who is here"; it does not answer "who matters".
+ * So the sales figures for the chosen period are joined onto each row by seller
+ * id, and a store with no sales in the period shows a dash rather than being
+ * hidden — a registered, silent shop is exactly the thing an admin wants to
+ * notice.
  */
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
+import { StoreReviewQueue } from "@/components/avtoqism/admin/StoreReviewQueue";
 import { num } from "@/components/avtoqism/panel/Charts";
 import { PanelSection, PanelToolbar } from "@/components/avtoqism/panel/PanelShell";
 import {
@@ -25,6 +30,7 @@ import {
 } from "@/components/avtoqism/panel/Widgets";
 import type { TopSeller } from "@/lib/api/types";
 import { formatSom, groupDigits } from "@/lib/format";
+import { useLang } from "@/lib/i18n";
 import { useAdminSellers, useTopSellers } from "@/lib/query/admin";
 
 export const Route = createFileRoute("/admin/sellers")({
@@ -51,6 +57,7 @@ const VERIFICATION_UZ: Record<string, string> = {
 };
 
 function AdminSellers() {
+  const { lang } = useLang();
   const [days, setDays] = useState(30);
   const [query, setQuery] = useState("");
 
@@ -72,6 +79,8 @@ function AdminSellers() {
 
   return (
     <div className="space-y-6">
+      <StoreReviewQueue lang={lang} />
+
       <PanelToolbar>
         <label className="relative flex-1 sm:max-w-xs">
           <span className="sr-only">Do'kon nomi bo'yicha qidirish</span>
@@ -97,8 +106,8 @@ function AdminSellers() {
         subtitle="Savdo ustunlari tanlangan davrga tegishli; qolganlari do'konning umumiy holati."
       >
         <p className="border-b border-border bg-muted/40 px-5 py-3 text-sm text-muted-foreground">
-          Do'konni tasdiqlash yoki to'xtatish hozircha bu yerdan qilinmaydi — API'da bunday endpoint
-          yo'q.
+          Bu jadval — reyestr: u kim borligini va qancha sotganini ko'rsatadi. Tasdiqlash,
+          to'xtatish va tiklash yuqoridagi «Do'konlarni ko'rib chiqish» bo'limida.
         </p>
 
         {sellers.isPending ? (

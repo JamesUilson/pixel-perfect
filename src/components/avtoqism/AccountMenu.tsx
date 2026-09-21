@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Store,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { useLogout, useMe } from "@/lib/query/auth";
@@ -146,6 +147,13 @@ export function AccountMenu({ className }: { className?: string | undefined }) {
             </MenuLink>
             <MenuLink to="/orders" icon={Receipt} onNavigate={() => setOpen(false)}>
               {t("nav.orders")}
+            </MenuLink>
+            {/*
+             * The balance sits with the buyer's own things, not the seller's:
+             * it is the money they put in, and the only way to reach it.
+             */}
+            <MenuLink to="/wallet" icon={Wallet} onNavigate={() => setOpen(false)}>
+              Hisobim
             </MenuLink>
             <MenuLink to="/garage" icon={CarFront} onNavigate={() => setOpen(false)}>
               {t("nav.garage")}

@@ -7,15 +7,20 @@
  * screen is: how many orders sit in each state and how much money each state
  * holds, with the full register one download away. The copy says so plainly
  * rather than leaving an admin hunting for a search box that is not there.
+ *
+ * Below it, receipts — which are per-order and therefore need an order id, the
+ * one thing that register hands out.
  */
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
+import { ReceiptsPanel } from "@/components/avtoqism/admin/ReceiptsPanel";
 import { ChartCard, DonutChart, num } from "@/components/avtoqism/panel/Charts";
 import { PanelSection } from "@/components/avtoqism/panel/PanelShell";
 import { Cell, DataTable, ExportButton, Row } from "@/components/avtoqism/panel/Widgets";
 import { formatSom, groupDigits } from "@/lib/format";
+import { useLang } from "@/lib/i18n";
 import { usePlatformStatuses } from "@/lib/query/admin";
 import { foldSeries } from "@/lib/viz";
 
@@ -39,6 +44,7 @@ const ORDER_STATUS_UZ: Record<string, string> = {
 };
 
 function AdminOrders() {
+  const { lang } = useLang();
   const statuses = usePlatformStatuses();
   // Memoised because two `useMemo`s below depend on it: a fresh `[]` on every
   // render would recompute the totals and the donut for nothing.
@@ -145,6 +151,8 @@ function AdminOrders() {
           <DonutChart data={slices} />
         </ChartCard>
       )}
+
+      <ReceiptsPanel lang={lang} />
     </div>
   );
 }

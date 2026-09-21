@@ -3,8 +3,91 @@ import { useSyncExternalStore } from "react";
 
 import { safeApi } from "@/lib/api/client";
 import { useIsAuthenticated } from "./session";
-import type { CartOut, CheckoutIn, OrderOut } from "@/lib/api/types";
+import type { CartOut, DeliveryMethod, OrderOut, PaymentMethod } from "@/lib/api/types";
 import { qk } from "./keys";
+
+/* --- the delivery half of an order -----------------------------------------
+ *
+ * `lib/api/schema.d.ts` is generated from an OpenAPI document that predates the
+ * richer address, the contact block and the five-step timeline, so those shapes
+ * are written out here and layered onto the generated `OrderOut`. When the
+ * schema is regenerated these aliases collapse to it without a call site
+ * changing.
+ * --------------------------------------------------------------------------- */
+
+/** One of the five buyer-facing steps. `at` is set once the step happened. */
+export type DeliveryStep = {
+  key: string;
+  label: string;
+  hint: string;
+  state: "done" | "active" | "upcoming";
+  at: string | null;
+};
+
+export type DeliveryTimeline = {
+  steps: DeliveryStep[];
+  /** Key of the lit step, or null for an order that ended early. */
+  current: string | null;
+  promised_date: string | null;
+  promise_days: number;
+  late: boolean;
+  /** Shown instead of a lit step: cancelled, refunded or disputed. */
+  notice: string | null;
+};
+
+/** The address as the driver reads it, with the map links already built. */
+export type DeliveryAddress = {
+  line: string;
+  lat: string | number | null;
+  lng: string | number | null;
+  /** `yandexnavi://` deep link — only useful where the app can exist. */
+  navigator_url: string | null;
+  maps_url: string | null;
+  pin_url: string | null;
+};
+
+export type OrderDetail = OrderOut & {
+  contact_is_self?: boolean;
+  promised_date?: string | null;
+  delivery?: DeliveryTimeline | null;
+  delivery_address?: DeliveryAddress | null;
+};
+
+/** `AddressIn` as the checkout endpoint now accepts it. */
+export type CheckoutAddress = {
+  recipient_name: string;
+  phone: string;
+  region: string;
+  district: string;
+  street: string;
+  house: string | null;
+  entrance: string | null;
+  floor: string | null;
+  apartment: string | null;
+  landmark: string | null;
+  /** Both or neither — the server answers 422 for half a pair. */
+  lat: number | null;
+  lng: number | null;
+};
+
+/** Who the driver rings. `is_self: false` needs both a name and a phone. */
+export type CheckoutContact = {
+  is_self: boolean;
+  name: string | null;
+  phone: string | null;
+};
+
+export type CheckoutBody = {
+  address: CheckoutAddress;
+  contact: CheckoutContact;
+  payment_method: PaymentMethod;
+  delivery_method: DeliveryMethod;
+  comment: string | null;
+  promo_code: string | null;
+  return_url: string | null;
+  /** Remember this address on the profile for next time. */
+  save_address: boolean;
+};
 
 /**
  * The cart, priced by the server.
@@ -109,7 +192,7 @@ export function useOrders() {
   const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.orders,
-    queryFn: () => safeApi<OrderOut[]>("/orders"),
+    queryFn: () => safeApi<OrderDetail[]>("/orders"),
     enabled: signedIn,
   });
 }
@@ -118,7 +201,7 @@ export function useOrder(orderId: string) {
   const signedIn = useIsAuthenticated();
   return useQuery({
     queryKey: qk.order(orderId),
-    queryFn: () => safeApi<OrderOut>(`/orders/${orderId}`),
+    queryFn: () => safeApi<OrderDetail>(`/orders/${orderId}`),
     enabled: signedIn && Boolean(orderId),
   });
 }
@@ -126,11 +209,14 @@ export function useOrder(orderId: string) {
 export function useCheckout() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: CheckoutIn) =>
-      safeApi<OrderOut>("/orders/checkout", { method: "POST", body: input }),
+    mutationFn: (input: CheckoutBody) =>
+      safeApi<OrderDetail>("/orders/checkout", { method: "POST", body: input }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["cart"] });
       void queryClient.invalidateQueries({ queryKey: qk.orders });
+      // A checkout may have saved the address it was given, so the book the
+      // profile screen and the next checkout read is no longer current.
+      void queryClient.invalidateQueries({ queryKey: qk.addresses });
     },
   });
 }
@@ -139,7 +225,7 @@ export function useCancelOrder() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ orderId, note }: { orderId: string; note?: string }) =>
-      safeApi<OrderOut>(`/orders/${orderId}/cancel`, {
+      safeApi<OrderDetail>(`/orders/${orderId}/cancel`, {
         method: "POST",
         body: { status: "CANCELLED", note },
       }),
