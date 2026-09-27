@@ -27,6 +27,8 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminSellersRouteImport } from './routes/admin.sellers'
 import { Route as AdminSystemRouteImport } from './routes/admin.system'
+import { Route as AdminVideosRouteImport } from './routes/admin.videos'
+import { Route as FeedVideoIdRouteImport } from './routes/feed.$videoId'
 import { Route as GarageIndexRouteImport } from './routes/garage.index'
 import { Route as GarageAddRouteImport } from './routes/garage.add'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
@@ -34,13 +36,16 @@ import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
 import { Route as SellerIndexRouteImport } from './routes/seller.index'
 import { Route as SellerAdsRouteImport } from './routes/seller.ads'
+import { Route as SellerFeedRouteImport } from './routes/seller.feed'
 import { Route as SellerFinanceRouteImport } from './routes/seller.finance'
 import { Route as SellerOrdersRouteImport } from './routes/seller.orders'
 import { Route as SellerProductsRouteImport } from './routes/seller.products'
 import { Route as SellerPromotionsRouteImport } from './routes/seller.promotions'
 import { Route as SellerSettingsRouteImport } from './routes/seller.settings'
+import { Route as SellerVideosRouteImport } from './routes/seller.videos'
 import { Route as SellerWarehousesRouteImport } from './routes/seller.warehouses'
 import { Route as SellerOnboardRouteImport } from './routes/seller_.onboard'
+import { Route as FeedCreatorsHandleRouteImport } from './routes/feed.creators.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -132,6 +137,16 @@ const AdminSystemRoute = AdminSystemRouteImport.update({
   path: '/system',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVideosRoute = AdminVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const FeedVideoIdRoute = FeedVideoIdRouteImport.update({
+  id: '/$videoId',
+  path: '/$videoId',
+  getParentRoute: () => FeedRoute,
+} as any)
 const GarageIndexRoute = GarageIndexRouteImport.update({
   id: '/garage/',
   path: '/garage/',
@@ -167,6 +182,11 @@ const SellerAdsRoute = SellerAdsRouteImport.update({
   path: '/ads',
   getParentRoute: () => SellerRoute,
 } as any)
+const SellerFeedRoute = SellerFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => SellerRoute,
+} as any)
 const SellerFinanceRoute = SellerFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -192,6 +212,11 @@ const SellerSettingsRoute = SellerSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => SellerRoute,
 } as any)
+const SellerVideosRoute = SellerVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => SellerRoute,
+} as any)
 const SellerWarehousesRoute = SellerWarehousesRouteImport.update({
   id: '/warehouses',
   path: '/warehouses',
@@ -202,13 +227,18 @@ const SellerOnboardRoute = SellerOnboardRouteImport.update({
   path: '/seller/onboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedCreatorsHandleRoute = FeedCreatorsHandleRouteImport.update({
+  id: '/creators/$handle',
+  path: '/creators/$handle',
+  getParentRoute: () => FeedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/feed': typeof FeedRoute
+  '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
@@ -221,27 +251,32 @@ export interface FileRoutesByFullPath {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/videos': typeof AdminVideosRoute
+  '/feed/$videoId': typeof FeedVideoIdRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/seller/ads': typeof SellerAdsRoute
+  '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/promotions': typeof SellerPromotionsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/videos': typeof SellerVideosRoute
   '/seller/warehouses': typeof SellerWarehousesRoute
   '/seller/onboard': typeof SellerOnboardRoute
   '/admin/': typeof AdminIndexRoute
   '/garage/': typeof GarageIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/seller/': typeof SellerIndexRoute
+  '/feed/creators/$handle': typeof FeedCreatorsHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/feed': typeof FeedRoute
+  '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
@@ -253,21 +288,26 @@ export interface FileRoutesByTo {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/videos': typeof AdminVideosRoute
+  '/feed/$videoId': typeof FeedVideoIdRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/seller/ads': typeof SellerAdsRoute
+  '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/promotions': typeof SellerPromotionsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/videos': typeof SellerVideosRoute
   '/seller/warehouses': typeof SellerWarehousesRoute
   '/seller/onboard': typeof SellerOnboardRoute
   '/admin': typeof AdminIndexRoute
   '/garage': typeof GarageIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/seller': typeof SellerIndexRoute
+  '/feed/creators/$handle': typeof FeedCreatorsHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -275,7 +315,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/feed': typeof FeedRoute
+  '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
@@ -288,21 +328,26 @@ export interface FileRoutesById {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/videos': typeof AdminVideosRoute
+  '/feed/$videoId': typeof FeedVideoIdRoute
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/seller/ads': typeof SellerAdsRoute
+  '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/promotions': typeof SellerPromotionsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/videos': typeof SellerVideosRoute
   '/seller/warehouses': typeof SellerWarehousesRoute
   '/seller_/onboard': typeof SellerOnboardRoute
   '/admin/': typeof AdminIndexRoute
   '/garage/': typeof GarageIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/seller/': typeof SellerIndexRoute
+  '/feed/creators/$handle': typeof FeedCreatorsHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -324,21 +369,26 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/sellers'
     | '/admin/system'
+    | '/admin/videos'
+    | '/feed/$videoId'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
     | '/seller/ads'
+    | '/seller/feed'
     | '/seller/finance'
     | '/seller/orders'
     | '/seller/products'
     | '/seller/promotions'
     | '/seller/settings'
+    | '/seller/videos'
     | '/seller/warehouses'
     | '/seller/onboard'
     | '/admin/'
     | '/garage/'
     | '/orders/'
     | '/seller/'
+    | '/feed/creators/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -356,21 +406,26 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/sellers'
     | '/admin/system'
+    | '/admin/videos'
+    | '/feed/$videoId'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
     | '/seller/ads'
+    | '/seller/feed'
     | '/seller/finance'
     | '/seller/orders'
     | '/seller/products'
     | '/seller/promotions'
     | '/seller/settings'
+    | '/seller/videos'
     | '/seller/warehouses'
     | '/seller/onboard'
     | '/admin'
     | '/garage'
     | '/orders'
     | '/seller'
+    | '/feed/creators/$handle'
   id:
     | '__root__'
     | '/'
@@ -390,21 +445,26 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/sellers'
     | '/admin/system'
+    | '/admin/videos'
+    | '/feed/$videoId'
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
     | '/seller/ads'
+    | '/seller/feed'
     | '/seller/finance'
     | '/seller/orders'
     | '/seller/products'
     | '/seller/promotions'
     | '/seller/settings'
+    | '/seller/videos'
     | '/seller/warehouses'
     | '/seller_/onboard'
     | '/admin/'
     | '/garage/'
     | '/orders/'
     | '/seller/'
+    | '/feed/creators/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -412,7 +472,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
-  FeedRoute: typeof FeedRoute
+  FeedRoute: typeof FeedRouteWithChildren
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRoute
   ProfileRoute: typeof ProfileRoute
@@ -555,6 +615,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSystemRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/videos': {
+      id: '/admin/videos'
+      path: '/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AdminVideosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/feed/$videoId': {
+      id: '/feed/$videoId'
+      path: '/$videoId'
+      fullPath: '/feed/$videoId'
+      preLoaderRoute: typeof FeedVideoIdRouteImport
+      parentRoute: typeof FeedRoute
+    }
     '/garage/': {
       id: '/garage/'
       path: '/garage'
@@ -604,6 +678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerAdsRouteImport
       parentRoute: typeof SellerRoute
     }
+    '/seller/feed': {
+      id: '/seller/feed'
+      path: '/feed'
+      fullPath: '/seller/feed'
+      preLoaderRoute: typeof SellerFeedRouteImport
+      parentRoute: typeof SellerRoute
+    }
     '/seller/finance': {
       id: '/seller/finance'
       path: '/finance'
@@ -639,6 +720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerSettingsRouteImport
       parentRoute: typeof SellerRoute
     }
+    '/seller/videos': {
+      id: '/seller/videos'
+      path: '/videos'
+      fullPath: '/seller/videos'
+      preLoaderRoute: typeof SellerVideosRouteImport
+      parentRoute: typeof SellerRoute
+    }
     '/seller/warehouses': {
       id: '/seller/warehouses'
       path: '/warehouses'
@@ -653,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerOnboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed/creators/$handle': {
+      id: '/feed/creators/$handle'
+      path: '/creators/$handle'
+      fullPath: '/feed/creators/$handle'
+      preLoaderRoute: typeof FeedCreatorsHandleRouteImport
+      parentRoute: typeof FeedRoute
+    }
   }
 }
 
@@ -663,6 +758,7 @@ interface AdminRouteChildren {
   AdminPromotionsRoute: typeof AdminPromotionsRoute
   AdminSellersRoute: typeof AdminSellersRoute
   AdminSystemRoute: typeof AdminSystemRoute
+  AdminVideosRoute: typeof AdminVideosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -673,29 +769,46 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPromotionsRoute: AdminPromotionsRoute,
   AdminSellersRoute: AdminSellersRoute,
   AdminSystemRoute: AdminSystemRoute,
+  AdminVideosRoute: AdminVideosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface FeedRouteChildren {
+  FeedVideoIdRoute: typeof FeedVideoIdRoute
+  FeedCreatorsHandleRoute: typeof FeedCreatorsHandleRoute
+}
+
+const FeedRouteChildren: FeedRouteChildren = {
+  FeedVideoIdRoute: FeedVideoIdRoute,
+  FeedCreatorsHandleRoute: FeedCreatorsHandleRoute,
+}
+
+const FeedRouteWithChildren = FeedRoute._addFileChildren(FeedRouteChildren)
+
 interface SellerRouteChildren {
   SellerAdsRoute: typeof SellerAdsRoute
+  SellerFeedRoute: typeof SellerFeedRoute
   SellerFinanceRoute: typeof SellerFinanceRoute
   SellerOrdersRoute: typeof SellerOrdersRoute
   SellerProductsRoute: typeof SellerProductsRoute
   SellerPromotionsRoute: typeof SellerPromotionsRoute
   SellerSettingsRoute: typeof SellerSettingsRoute
+  SellerVideosRoute: typeof SellerVideosRoute
   SellerWarehousesRoute: typeof SellerWarehousesRoute
   SellerIndexRoute: typeof SellerIndexRoute
 }
 
 const SellerRouteChildren: SellerRouteChildren = {
   SellerAdsRoute: SellerAdsRoute,
+  SellerFeedRoute: SellerFeedRoute,
   SellerFinanceRoute: SellerFinanceRoute,
   SellerOrdersRoute: SellerOrdersRoute,
   SellerProductsRoute: SellerProductsRoute,
   SellerPromotionsRoute: SellerPromotionsRoute,
   SellerSettingsRoute: SellerSettingsRoute,
+  SellerVideosRoute: SellerVideosRoute,
   SellerWarehousesRoute: SellerWarehousesRoute,
   SellerIndexRoute: SellerIndexRoute,
 }
@@ -708,7 +821,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
-  FeedRoute: FeedRoute,
+  FeedRoute: FeedRouteWithChildren,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRoute,
   ProfileRoute: ProfileRoute,

@@ -13,6 +13,7 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import {
   BadgePercent,
+  Clapperboard,
   ClipboardList,
   LayoutDashboard,
   Megaphone,
@@ -113,6 +114,7 @@ function AdminNav() {
     { to: "/admin/sellers", label: "Sotuvchilar", icon: Store },
     { to: "/admin/orders", label: "Buyurtmalar", icon: ClipboardList },
     { to: "/admin/ads", label: "Reklama", icon: Megaphone, badge: adsWaiting },
+    { to: "/admin/videos", label: "Videolar", icon: Clapperboard },
     { to: "/admin/promotions", label: "Aksiyalar", icon: BadgePercent },
     { to: "/admin/system", label: "Tizim", icon: ShieldCheck },
   ];

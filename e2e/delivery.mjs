@@ -154,7 +154,8 @@ try {
       payment_method: "CASH_ON_DELIVERY",
     },
   });
-  if (placed.status !== 201) throw new Error(`checkout: ${placed.status} ${JSON.stringify(placed.body).slice(0, 200)}`);
+  if (placed.status !== 201)
+    throw new Error(`checkout: ${placed.status} ${JSON.stringify(placed.body).slice(0, 200)}`);
   const order = placed.body;
 
   const line = order.delivery_address?.line ?? "";
@@ -181,9 +182,7 @@ try {
   await page.goto(`${BASE}/orders/${order.id}`, { waitUntil: "networkidle" });
   await page.waitForTimeout(1500);
   const shown = await page.locator("body").innerText();
-  ["Yig'ilmoqda", "Tayyor bo'ldi", "Kuryerga berildi", "Yetkazildi"].every((s) =>
-    shown.includes(s),
-  )
+  ["Yig'ilmoqda", "Tayyor bo'ldi", "Kuryerga berildi", "Yetkazildi"].every((s) => shown.includes(s))
     ? ok("DELIVERY TIMELINE", "all four stages drawn for the buyer")
     : bad("DELIVERY TIMELINE", "a stage label is missing from the page");
 
@@ -208,9 +207,7 @@ try {
   await page.waitForTimeout(1500);
   const live = await api(`/orders/${order.id}`, { token: buyer.access_token });
   const active = live.body?.delivery?.steps?.find((s) => s.state === "active");
-  const marked = await page
-    .locator('[aria-current="step"], [data-state="active"]')
-    .allInnerTexts();
+  const marked = await page.locator('[aria-current="step"], [data-state="active"]').allInnerTexts();
   active?.key === "ready" && marked.some((t) => t.includes("Tayyor bo'ldi"))
     ? ok("TIMELINE MOVES", "the lit step followed the order")
     : bad("TIMELINE MOVES", `server says ${active?.key}, page marks ${JSON.stringify(marked)}`);
@@ -219,7 +216,9 @@ try {
   await signIn(sellerTokens);
   await page.goto(`${BASE}/seller/orders`, { waitUntil: "networkidle" });
   await page.waitForTimeout(2000);
-  const navLinks = await page.locator('a[href^="yandexnavi://"], a[href*="yandex.uz/maps"]').count();
+  const navLinks = await page
+    .locator('a[href^="yandexnavi://"], a[href*="yandex.uz/maps"]')
+    .count();
   navLinks > 0
     ? ok("SELLER ROUTE LINKS", `${navLinks} orders openable in a map`)
     : bad("SELLER ROUTE LINKS", "the driver has no route to tap");
@@ -281,7 +280,9 @@ try {
     : bad("REQUEST LOG", `${logs.status}`);
 
   const leaked = JSON.stringify(logs.body).includes(adminTokens.access_token.slice(0, 24));
-  leaked ? bad("LOG KEEPS NO SECRETS", "an access token survived into the log") : ok("LOG KEEPS NO SECRETS");
+  leaked
+    ? bad("LOG KEEPS NO SECRETS", "an access token survived into the log")
+    : ok("LOG KEEPS NO SECRETS");
 
   const forbidden = await api("/admin/logs/requests", { token: buyer.access_token });
   forbidden.status === 403

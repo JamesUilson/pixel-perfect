@@ -128,4 +128,35 @@ export const qk = {
   adminRequestLog: (logId: string) => ["admin", "logs", "request", logId] as const,
   adminAuditLogs: (filters: Record<string, unknown>) =>
     ["admin", "logs", "audit", filters] as const,
+
+  /* --- the feed studio: a store's clips and their numbers ------------------
+   * Under "seller" like the rest of the panel, so switching store or saving a
+   * clip drops the statistics with everything else that store owns. The window
+   * is part of the key because the four chips are four different answers, not
+   * four filters over one.
+   */
+  creatorStats: (sellerId: string, window: string) =>
+    ["seller", sellerId, "feed-stats", window] as const,
+  /** Page size is part of the key: the grid asks for twelve and the statistics
+   * screen asks for one only to learn whether the store has ever posted. */
+  sellerVideos: (sellerId: string, page: number, perPage: number) =>
+    ["seller", sellerId, "videos", page, perPage] as const,
+  sellerVideo: (sellerId: string, videoId: string) =>
+    ["seller", sellerId, "video", videoId] as const,
+
+  /** Begins with "admin", so `qk.admin` still clears it. */
+  adminVideoQueue: (filters: Record<string, unknown>) =>
+    ["admin", "videos", "pending", filters] as const,
+
+  /* --- the public feed -----------------------------------------------------
+   * Every key here begins with "feed", so one predicate reaches the lot — and
+   * it has to: a like lands on the same video in the scroller, in the detail
+   * screen and in a creator's grid, and those are three cache entries.
+   */
+  feed: (filters: Record<string, unknown>) => ["feed", filters] as const,
+  feedVideo: (videoId: string) => ["feed", "video", videoId] as const,
+  feedComments: (videoId: string, sort: string) => ["feed", "comments", videoId, sort] as const,
+  feedReplies: (commentId: string) => ["feed", "replies", commentId] as const,
+  creator: (handle: string) => ["feed", "creator", handle] as const,
+  creatorGrid: (handle: string, tab: string) => ["feed", "creator", handle, "grid", tab] as const,
 } as const;

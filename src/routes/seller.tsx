@@ -11,7 +11,9 @@ import { useMemo, useState } from "react";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import {
   BadgePercent,
+  BarChart3,
   Boxes,
+  Clapperboard,
   ClipboardList,
   LayoutDashboard,
   Megaphone,
@@ -111,6 +113,8 @@ function SellerNav({
     { to: "/seller/finance", label: "Moliya", icon: Wallet },
     { to: "/seller/promotions", label: "Aksiyalar", icon: BadgePercent },
     { to: "/seller/ads", label: "Reklama", icon: Megaphone },
+    { to: "/seller/videos", label: "Videolar", icon: Clapperboard },
+    { to: "/seller/feed", label: "Statistika", icon: BarChart3 },
     { to: "/seller/settings", label: "Do'kon sozlamalari", icon: Store },
   ];
 

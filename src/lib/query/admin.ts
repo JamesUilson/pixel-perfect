@@ -817,3 +817,71 @@ export function usePurgeRequestLogs() {
     onSuccess: invalidate,
   });
 }
+
+/* --- video moderation -----------------------------------------------------------
+ * The queue the feed waits on. Shapes written by hand from
+ * `app/modules/videos/router.py`, which answers with a plain dict; the
+ * generated schema does not describe the videos module yet.
+ */
+export type PendingVideoRow = {
+  id: string;
+  seller_id: string | null;
+  store_name: string | null;
+  handle: string | null;
+  caption: string | null;
+  hashtags: string[];
+  region: string | null;
+  playback_url: string | null;
+  thumbnail_url: string | null;
+  duration_seconds: number | null;
+  status: string;
+  moderation_status: string;
+  published_at: string | null;
+  created_at: string;
+  /** The seller has already pressed publish: only this decision is missing. */
+  waiting_in_feed: boolean;
+};
+
+export type PendingVideoQueue = {
+  total: number;
+  limit: number;
+  offset: number;
+  items: PendingVideoRow[];
+};
+
+export function useAdminPendingVideos(limit = 50, offset = 0) {
+  const signedIn = useIsAuthenticated();
+  return useQuery({
+    queryKey: qk.adminVideoQueue({ limit, offset }),
+    queryFn: () =>
+      safeApi<PendingVideoQueue>("/admin/videos/pending", { query: { limit, offset } }),
+    enabled: signedIn,
+  });
+}
+
+/**
+ * Approve, or reject with a reason the server insists on.
+ *
+ * The reason is written to the audit log and nowhere else, so the seller reads
+ * only that their clip was rejected. That is a backend gap, not something to
+ * paper over here with a field the API does not have.
+ */
+export function useModerateVideo() {
+  const invalidate = useAdminInvalidator();
+  return useMutation({
+    mutationFn: ({
+      videoId,
+      approved,
+      reason,
+    }: {
+      videoId: string;
+      approved: boolean;
+      reason?: string | undefined;
+    }) =>
+      safeApi<unknown>(`/admin/videos/${videoId}/moderate`, {
+        method: "POST",
+        body: { approved, reason },
+      }),
+    onSuccess: invalidate,
+  });
+}

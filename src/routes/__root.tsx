@@ -17,8 +17,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { LangProvider } from "@/lib/i18n";
 import { UiStateProvider } from "@/lib/store";
 
-/** The feed is a full-bleed dark surface: it renders its own chrome. */
-const CHROMELESS_ROUTES = ["/feed"];
+/** The feed is full-bleed, so it draws its own header instead of the top bar.
+ *  It keeps the shared bottom bar unchanged: a second bar of its own is what
+ *  made the navigation change shape between screens. */
+const TOPBARLESS_ROUTES = ["/feed"];
 
 function NotFoundComponent() {
   return (
@@ -127,10 +129,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function AppChrome() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const chromeless = CHROMELESS_ROUTES.some((p) => pathname.startsWith(p));
+  const bare = TOPBARLESS_ROUTES.some((p) => pathname.startsWith(p));
 
-  if (chromeless) {
-    return <Outlet />;
+  if (bare) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <main id="main" className="flex-1">
+          <Outlet />
+        </main>
+        <BottomNav />
+      </div>
+    );
   }
 
   return (

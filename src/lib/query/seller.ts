@@ -881,3 +881,307 @@ export function useCreateCampaignWithCreative(sellerId: string) {
     onSuccess: invalidate,
   });
 }
+
+/* --- the feed studio ------------------------------------------------------------
+ * Clips, the numbers they produce, and the two uploads behind them. Appended
+ * rather than woven in: the videos module landed after this file was written
+ * and `schema.d.ts` does not describe it yet, so the shapes below are written
+ * by hand from `app/modules/videos` and become redundant — not wrong — when the
+ * OpenAPI types are regenerated.
+ */
+
+/** The four chips on the statistics screen. The server refuses anything else. */
+export type StatsWindow = "7" | "30" | "90" | "all";
+
+export type CreatorTile = {
+  total: number;
+  /** Null over "Barcha": there is no window before all of time to compare to. */
+  previous: number | null;
+  /** Null when there is no baseline — never 0, which would read as "flat". */
+  change_percent: number | null;
+  windowed: boolean;
+};
+
+export type CreatorStats = {
+  window: StatsWindow;
+  days: number;
+  since: string;
+  previous_since: string | null;
+  tiles: {
+    views: CreatorTile;
+    likes: CreatorTile;
+    comments: CreatorTile;
+    shares: CreatorTile;
+  };
+  /** One point per day, zero days included, so the line has no holes in it. */
+  views_by_day: { day: string; views: number }[];
+  /** How much of `days` the line actually covers — "all" is capped at a year. */
+  series_days: number;
+  audience: {
+    by_region: {
+      unit: string;
+      /** An anonymous view has no region; the clip's stands in. */
+      source: string;
+      rows: { region: string; views: number }[];
+    };
+    by_follow: { unit: string; followers: number; non_followers: number; anonymous: number };
+    by_recency: { unit: string; new: number; returning: number; anonymous_views: number };
+    /**
+     * Always null, and typed that way on purpose: nothing in this system stores
+     * a birth date, so the design's age panel has no data behind it and the
+     * server says so in `by_age_note` instead of inventing bands.
+     */
+    by_age: null;
+    by_age_note: string;
+  };
+  top_videos: {
+    video_id: string;
+    caption: string | null;
+    thumbnail_url: string | null;
+    published_at: string | null;
+    views: number;
+    likes: number;
+    comments: number;
+    shares: number;
+  }[];
+};
+
+export type VideoStatus = "UPLOADING" | "PROCESSING" | "READY" | "FAILED" | "REMOVED";
+export type VideoModerationStatus =
+  "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "REMOVED";
+
+export type TaggedProduct = {
+  product_id: string;
+  offer_id: string | null;
+  name: string;
+  slug: string;
+  image_url: string | null;
+  price: string | null;
+  currency: string;
+  in_stock: boolean;
+  position_x: string | null;
+  position_y: string | null;
+  start_second: number | null;
+  sort_order: number;
+};
+
+export type TaggedVehicle = {
+  variant_id: string | null;
+  model_id: string | null;
+  label: string;
+};
+
+export type CreatorVideo = {
+  id: string;
+  seller_id: string | null;
+  author_id: string;
+  caption: string | null;
+  hashtags: string[];
+  region: string | null;
+  district: string | null;
+  status: VideoStatus;
+  moderation_status: VideoModerationStatus;
+  /** The one field to branch on; everything else is the reason behind it. */
+  is_public: boolean;
+  /** What is still standing between this clip and the feed, already in Uzbek. */
+  pending: string[];
+  playback_url: string | null;
+  hls_url: string | null;
+  thumbnail_url: string | null;
+  duration_seconds: number | null;
+  width: number | null;
+  height: number | null;
+  size_bytes: number | null;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  save_count: number;
+  share_count: number;
+  published_at: string | null;
+  created_at: string;
+  products: TaggedProduct[];
+  vehicles: TaggedVehicle[];
+};
+
+/** A tile in the grid. The three moderation fields are filled for the owner. */
+export type CreatorVideoCard = {
+  id: string;
+  thumbnail_url: string | null;
+  playback_url: string | null;
+  caption: string | null;
+  duration_seconds: number | null;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  published_at: string | null;
+  status: VideoStatus | null;
+  moderation_status: VideoModerationStatus | null;
+  is_public: boolean | null;
+};
+
+export type CreatorVideoGrid = {
+  tab: "videos" | "products" | "saved";
+  items: CreatorVideoCard[];
+  products: TaggedProduct[];
+  total: number;
+  page: number;
+  per_page: number;
+  has_more: boolean;
+};
+
+export type VideoProductTagIn = {
+  product_id: string;
+  /** Left out: the server fills in this store's own offer for the product. */
+  offer_id?: string | undefined;
+  sort_order?: number | undefined;
+};
+
+export type VideoVehicleTagIn = {
+  variant_id?: string | undefined;
+  model_id?: string | undefined;
+};
+
+export type VideoCreateBody = {
+  file_id: string;
+  thumbnail_file_id?: string | undefined;
+  caption?: string | undefined;
+  hashtags?: string[] | undefined;
+  region?: string | undefined;
+  district?: string | undefined;
+  duration_seconds?: number | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+  products?: VideoProductTagIn[] | undefined;
+  vehicles?: VideoVehicleTagIn[] | undefined;
+};
+
+/**
+ * Everything left out is left alone — except the two tag lists, where a list
+ * sent at all replaces the whole set, because there is no way to say "drop this
+ * one tag" in a body that only ever adds.
+ */
+export type VideoUpdateBody = {
+  caption?: string | undefined;
+  hashtags?: string[] | undefined;
+  region?: string | undefined;
+  district?: string | undefined;
+  thumbnail_file_id?: string | undefined;
+  products?: VideoProductTagIn[] | undefined;
+  vehicles?: VideoVehicleTagIn[] | undefined;
+};
+
+export function useCreatorStats(sellerId: string, window: StatsWindow) {
+  return useQuery({
+    queryKey: qk.creatorStats(sellerId, window),
+    queryFn: () =>
+      safeApi<CreatorStats>(`/seller/${sellerId}/feed/stats`, { query: { days: window } }),
+    enabled: Boolean(sellerId),
+  });
+}
+
+export function useSellerVideos(sellerId: string, page = 1, perPage = 12) {
+  return useQuery({
+    queryKey: qk.sellerVideos(sellerId, page, perPage),
+    queryFn: () =>
+      safeApi<CreatorVideoGrid>(`/seller/${sellerId}/videos`, {
+        query: { page, per_page: perPage },
+      }),
+    enabled: Boolean(sellerId),
+  });
+}
+
+/**
+ * One clip in full. The grid tile carries no caption tags, no region and no
+ * product tags, so the edit form loads the whole row rather than editing from
+ * a summary and silently blanking whatever the summary left out.
+ */
+export function useSellerVideo(sellerId: string, videoId: string | null) {
+  return useQuery({
+    queryKey: qk.sellerVideo(sellerId, videoId ?? ""),
+    queryFn: () => safeApi<CreatorVideo>(`/seller/${sellerId}/videos/${videoId ?? ""}`),
+    enabled: Boolean(sellerId) && Boolean(videoId),
+  });
+}
+
+export function useCreateVideo(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (body: VideoCreateBody) =>
+      safeApi<CreatorVideo>(`/seller/${sellerId}/videos`, { method: "POST", body }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useUpdateVideo(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: ({ videoId, ...body }: VideoUpdateBody & { videoId: string }) =>
+      safeApi<CreatorVideo>(`/seller/${sellerId}/videos/${videoId}`, { method: "PATCH", body }),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteVideo(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    // The row comes back rather than a 204, so the screen can show the clip as
+    // removed instead of guessing that something happened.
+    mutationFn: (videoId: string) =>
+      safeApi<CreatorVideo>(`/seller/${sellerId}/videos/${videoId}`, { method: "DELETE" }),
+    onSuccess: invalidate,
+  });
+}
+
+export function usePublishVideo(sellerId: string) {
+  const invalidate = useScopeInvalidator(sellerId);
+  return useMutation({
+    mutationFn: (videoId: string) =>
+      safeApi<CreatorVideo>(`/seller/${sellerId}/videos/${videoId}/publish`, { method: "POST" }),
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * The clip itself and its still frame.
+ *
+ * Both go through the same `/uploads` endpoint and the same progress-reporting
+ * XHR as every other file — a 200 MB clip is exactly the case a progress bar
+ * exists for. `UploadPurpose` above was written before the feed module existed
+ * and this file is only ever appended to, so the two new purposes are named
+ * here; the server's enum carries both.
+ */
+export type CreatorUploadPurpose = "VIDEO" | "VIDEO_THUMBNAIL";
+
+export type CreatorUploadRequest = {
+  file: File;
+  purpose: CreatorUploadPurpose;
+  /**
+   * Not required by the server for these two purposes, but sent anyway: it
+   * makes the file reachable by the store's other staff, so the person who
+   * films and the person who writes the caption need not be the same person.
+   */
+  sellerId: string;
+};
+
+export function useUploadCreatorFile(
+  options: { onProgress?: ((percent: number) => void) | undefined } = {},
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreatorUploadRequest) =>
+      uploadFile(
+        {
+          file: input.file,
+          purpose: input.purpose as unknown as UploadPurpose,
+          sellerId: input.sellerId,
+        },
+        options.onProgress,
+      ),
+    onSuccess: (row) => {
+      void queryClient.invalidateQueries({ queryKey: qk.myUploads });
+      if (row.seller_id) {
+        void queryClient.invalidateQueries({ queryKey: qk.sellerScope(row.seller_id) });
+      }
+    },
+  });
+}
