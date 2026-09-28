@@ -204,6 +204,65 @@ try {
     ? ok("CURRENT PASSWORD REQUIRED", `${wrongCurrent.status}`)
     : bad("CURRENT PASSWORD REQUIRED", "it changed without the current one");
 
+  // ---- forgetting a password --------------------------------------------------
+  //: Login locks an account after repeated failures, so until this screen
+  //: existed the person most likely to need a way back in had none.
+  const forgetful = await freshBuyer();
+  await page.goto(`${BASE}/password`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1200);
+  const recovery = await page.locator("body").innerText();
+  recovery.includes("Parolni tiklash")
+    ? ok("RECOVERY SCREEN", "reachable at /password")
+    : bad("RECOVERY SCREEN", recovery.slice(0, 120).replace(/\n/g, " "));
+
+  const linked = await page.goto(`${BASE}/login`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1000);
+  const fromLogin = await page.getByRole("link", { name: /Parolni unutdingizmi/ }).count();
+  linked && fromLogin > 0
+    ? ok("RECOVERY IS LINKED", "from the sign-in form")
+    : bad("RECOVERY IS LINKED", `${fromLogin} links`);
+
+  const asked = await api("/auth/password/forgot", {
+    method: "POST",
+    body: { identifier: forgetful.phone },
+  });
+  const resetWeak = await api("/auth/password/reset", {
+    method: "POST",
+    body: {
+      identifier: forgetful.phone,
+      code: asked.body?.debug_code,
+      new_password: "12345678",
+    },
+  });
+  resetWeak.status === 422 && resetWeak.body?.error?.code === "weak_password"
+    ? ok("RESET REFUSES A WEAK PASSWORD", "the third door has the same lock")
+    : bad("RESET REFUSES A WEAK PASSWORD", `${resetWeak.status}`);
+
+  const resetGood = await api("/auth/password/reset", {
+    method: "POST",
+    body: {
+      identifier: forgetful.phone,
+      code: asked.body?.debug_code,
+      new_password: "Boshqa9Parol",
+    },
+  });
+  const signedIn = await api("/auth/login", {
+    method: "POST",
+    body: { identifier: forgetful.phone, password: "Boshqa9Parol" },
+  });
+  resetGood.status === 204 && signedIn.status === 200
+    ? ok("RESET WORKS", "the new password signs in")
+    : bad("RESET WORKS", `${resetGood.status} / ${signedIn.status}`);
+
+  //: And it says nothing about whether the account exists.
+  const unknown = await api("/auth/password/forgot", {
+    method: "POST",
+    body: { identifier: phone() },
+  });
+  unknown.status === asked.status && unknown.body?.sent === asked.body?.sent
+    ? ok("RECOVERY DOES NOT ENUMERATE", "same answer for an unknown number")
+    : bad("RECOVERY DOES NOT ENUMERATE", `${unknown.status} vs ${asked.status}`);
+
   // ---- the feed, at two widths -----------------------------------------------
   await page.goto(`${BASE}/feed`, { waitUntil: "networkidle" });
   await page.waitForTimeout(2500);

@@ -194,3 +194,43 @@ export function useRegisterVerify() {
     },
   });
 }
+
+/* ============================================================================
+ * Forgetting a password
+ *
+ * Both endpoints existed from the beginning and nothing in the interface ever
+ * called them, so a buyer who forgot their password — and who login locks out
+ * after repeated attempts — had no way back into their own account.
+ * ========================================================================== */
+
+export type ResetRequested = {
+  sent: boolean;
+  expires_in: number;
+  /** Outside production only, so a developer can get in without an SMS gateway. */
+  debug_code?: string | null;
+};
+
+export function useForgotPassword() {
+  return useMutation({
+    // Anonymous by design, and it answers the same whether or not the account
+    // exists: an endpoint that says "no such number" is a tool for finding out
+    // who has an account here.
+    mutationFn: (input: { identifier: string }) =>
+      safeApi<ResetRequested>("/auth/password/forgot", {
+        method: "POST",
+        body: input,
+        anonymous: true,
+      }),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: (input: { identifier: string; code: string; new_password: string }) =>
+      safeApi<void>("/auth/password/reset", {
+        method: "POST",
+        body: input,
+        anonymous: true,
+      }),
+  });
+}

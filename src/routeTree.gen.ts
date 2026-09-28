@@ -16,6 +16,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as PasswordRouteImport } from './routes/password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as SellerRouteImport } from './routes/seller'
@@ -81,6 +82,11 @@ const LoginRoute = LoginRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PasswordRoute = PasswordRouteImport.update({
+  id: '/password',
+  path: '/password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
+  '/password': typeof PasswordRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/seller': typeof SellerRouteWithChildren
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
+  '/password': typeof PasswordRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRoute
+  '/password': typeof PasswordRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/seller': typeof SellerRouteWithChildren
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/marketplace'
+    | '/password'
     | '/profile'
     | '/register'
     | '/seller'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/marketplace'
+    | '/password'
     | '/profile'
     | '/register'
     | '/settings'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/marketplace'
+    | '/password'
     | '/profile'
     | '/register'
     | '/seller'
@@ -487,6 +499,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRouteWithChildren
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRoute
+  PasswordRoute: typeof PasswordRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   SellerRoute: typeof SellerRouteWithChildren
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/password': {
+      id: '/password'
+      path: '/password'
+      fullPath: '/password'
+      preLoaderRoute: typeof PasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -844,6 +864,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRouteWithChildren,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRoute,
+  PasswordRoute: PasswordRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   SellerRoute: SellerRouteWithChildren,

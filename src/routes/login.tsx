@@ -160,6 +160,16 @@ function LoginPage() {
           {login.isPending && <Loader2 className="size-4 animate-spin" />}
           {t("auth.login")}
         </button>
+
+        {/* Under the button, where somebody who just failed is looking — and
+            login locks an account after repeated failures, so this is the only
+            way back for the person most likely to need it. */}
+        <Link
+          to="/password"
+          className="type-caption block text-center underline underline-offset-4"
+        >
+          Parolni unutdingizmi?
+        </Link>
       </form>
 
       {/*
