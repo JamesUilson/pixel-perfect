@@ -90,7 +90,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Garajingizga mashinangizni qo'shing va faqat mos keladigan ehtiyot qismlarni ko'ring. Toshkentdagi ishonchli sotuvchilar, tekshirilgan moslik, tez yetkazib berish.",
       },
-      { name: "theme-color", content: "#faf8f5" },
+      /*
+       * The browser's own chrome, so a dark page does not keep a cream address
+       * bar. Scoped to the *system* preference rather than to `data-theme`: a
+       * media-scoped meta is the only form the browser resolves by itself, and
+       * mutating a tag React renders to track an in-app override would be a
+       * fight with the framework over an address-bar tint. The default choice is
+       * "system", so this is right for almost everybody and never wrong enough
+       * to notice.
+       */
+      { name: "theme-color", content: "#faf8f5", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#111418", media: "(prefers-color-scheme: dark)" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "AVTOQISM" },
       { property: "og:locale", content: "uz_UZ" },
@@ -113,10 +123,53 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+/**
+ * The theme, before the first paint.
+ *
+ * This runs synchronously in <head>, long before React hydrates, because the
+ * alternative is visible: a person who chose dark gets a white flash on every
+ * navigation that reloads the document, and that is the one thing a theme switch
+ * must not do.
+ *
+ * React hoists the stylesheet links above this script in the rendered head, so
+ * it is not first in the document however it is written here. That is harmless
+ * and in fact load-bearing: a blocking stylesheet delays this script, and it
+ * delays the first paint by strictly more, so the attributes are always on
+ * <html> before anything is drawn.
+ *
+ * It writes three things and nothing else:
+ *   - `data-theme`, but only for an explicit choice. "System" leaves the
+ *     attribute off on purpose, so the `prefers-color-scheme` rule in
+ *     `styles.css` decides — which is also what a visitor with JavaScript
+ *     disabled gets.
+ *   - the `dark` class, because `@custom-variant dark` and
+ *     `components/ui/chart.tsx` key off it rather than off the attribute.
+ *   - the three accessibility attributes, for the same reason: text that is
+ *     meant to be larger should not start small and grow.
+ *
+ * The storage key and the field names are duplicated from
+ * `lib/query/settings.ts` deliberately — this string is not a module and cannot
+ * import one. They must stay in step; that file's `VISUAL_PREFERENCES_KEY` says
+ * so too.
+ */
+const THEME_BOOTSTRAP = `(function(){try{
+var r=document.documentElement;
+var p={};try{p=JSON.parse(localStorage.getItem("avtoqism.appearance"))||{}}catch(e){}
+var t=p.theme;
+if(t==="dark"||t==="light")r.setAttribute("data-theme",t);else r.removeAttribute("data-theme");
+var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+r.classList.toggle("dark",d);
+r.style.colorScheme=d?"dark":"light";
+if(p.reducedMotion)r.setAttribute("data-reduce-motion","");
+if(p.largerText)r.setAttribute("data-text-lg","");
+if(p.highContrast)r.setAttribute("data-high-contrast","");
+}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="uz">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
         <HeadContent />
       </head>
       <body>

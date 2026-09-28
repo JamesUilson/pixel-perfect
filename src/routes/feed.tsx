@@ -1,5 +1,6 @@
 import { Link, Outlet, createFileRoute, useChildMatches } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Brand } from "@/components/avtoqism/Chrome";
 import { ErrorState } from "@/components/avtoqism/States";
@@ -46,6 +47,7 @@ function FeedScroller() {
   const [muted, setMuted] = useState(true);
   const [sheet, setSheet] = useState<"comments" | "share" | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
 
   const items = useMemo(() => feed.data?.pages.flatMap((page) => page.items) ?? [], [feed.data]);
 
@@ -57,6 +59,38 @@ function FeedScroller() {
 
   const current = items.find((item) => item.video.id === activeId) ?? items[0] ?? null;
   const actions = useVideoActions(current);
+
+  /**
+   * Move one clip. Scrolling by a slide and letting snap settle it keeps the
+   * IntersectionObserver in charge of which clip is active — there is no index
+   * to keep in step with the DOM, which is the bug every carousel has.
+   */
+  const step = useCallback((delta: 1 | -1) => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    scroller.scrollBy({ top: delta * scroller.clientHeight, behavior: "smooth" });
+  }, []);
+
+  // A reel on a laptop is driven with the arrow keys, and the buttons below are
+  // useless to anyone on a keyboard without this.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA)$/.test(target.tagName)) return;
+      if (target?.isContentEditable) return;
+      if (event.key === "ArrowDown" || event.key === "PageDown") {
+        event.preventDefault();
+        step(1);
+      } else if (event.key === "ArrowUp" || event.key === "PageUp") {
+        event.preventDefault();
+        step(-1);
+      } else if (event.key.toLowerCase() === "m") {
+        setMuted((value) => !value);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [step]);
 
   const { hasNextPage, isFetchingNextPage, fetchNextPage } = feed;
   useEffect(() => {
@@ -119,7 +153,10 @@ function FeedScroller() {
           </div>
         </div>
       ) : (
-        <div className="h-[100dvh] snap-y snap-mandatory overflow-y-auto overscroll-y-contain no-scrollbar">
+        <div
+          ref={scrollerRef}
+          className="h-[100dvh] snap-y snap-mandatory overflow-y-auto overscroll-y-contain no-scrollbar"
+        >
           {items.map((item) => (
             <FeedClip
               key={item.video.id}
@@ -146,6 +183,19 @@ function FeedScroller() {
         </div>
       )}
 
+      {/* Wide screens only: a phone is scrolled with a thumb, and a pair of
+          buttons over the clip would just cover it. */}
+      {items.length > 0 && (
+        <div className="pointer-events-none absolute inset-y-0 right-6 z-30 hidden flex-col items-center justify-center gap-3 lg:flex">
+          <StepButton label="Oldingi video" onClick={() => step(-1)}>
+            <ChevronUp className="size-5" />
+          </StepButton>
+          <StepButton label="Keyingi video" onClick={() => step(1)}>
+            <ChevronDown className="size-5" />
+          </StepButton>
+        </div>
+      )}
+
       {current && (
         <>
           <CommentsSheet
@@ -163,5 +213,26 @@ function FeedScroller() {
         </>
       )}
     </div>
+  );
+}
+
+function StepButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="pointer-events-auto grid size-11 place-items-center rounded-full border border-border bg-card/80 text-foreground backdrop-blur-md transition-colors hover:bg-card"
+    >
+      {children}
+    </button>
   );
 }

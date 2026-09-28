@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CarFront, Globe, LogOut, Receipt, ShoppingBag } from "lucide-react";
+import { CarFront, Globe, LogOut, Receipt, Settings, ShoppingBag } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { EmptyState, Page, PageTitle, SectionHead } from "@/components/avtoqism/Page";
@@ -145,6 +145,10 @@ function Profile() {
         <Item to="/orders" icon={Receipt} label={t("orders.title")} />
         <Item to="/cart" icon={ShoppingBag} label={t("cart.title")} />
         <Item to="/garage" icon={CarFront} label={t("garage.title")} />
+        {/* The language switch lower down stays where it is — it is the one
+            setting a buyer changes often enough to want it on this screen. The
+            other six live on /settings. */}
+        <Item to="/settings" icon={Settings} label={t("settings.title")} />
       </nav>
 
       {/* --- purchase history ------------------------------------------------ */}
@@ -335,7 +339,7 @@ function Item({
   icon: Icon,
   label,
 }: {
-  to: "/orders" | "/cart" | "/garage";
+  to: "/orders" | "/cart" | "/garage" | "/settings";
   icon: typeof Receipt;
   label: string;
 }) {

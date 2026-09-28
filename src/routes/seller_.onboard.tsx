@@ -14,6 +14,7 @@ import { Boxes, Check, Clock, Megaphone, Percent, Truck, Wallet } from "lucide-r
 
 import { Page, PageTitle } from "@/components/avtoqism/Page";
 import { SignInRequired } from "@/components/avtoqism/SignInRequired";
+import { VerificationPrompt } from "@/components/avtoqism/auth/VerificationPrompt";
 import { ImageUpload } from "@/components/avtoqism/panel/ImageUpload";
 import {
   EMPTY_COORDINATES,
@@ -24,6 +25,7 @@ import {
 import type { Coordinates } from "@/components/avtoqism/panel/LocationPicker";
 import { Button, Field, Input, Pill, inputClass } from "@/components/avtoqism/panel/Widgets";
 import { ApiError } from "@/lib/api/client";
+import { isUnverified, useMe } from "@/lib/query/auth";
 import { useIsAuthenticated } from "@/lib/query/session";
 import { useMyStores, useOnboardSeller, useUpdateStore } from "@/lib/query/seller";
 import type { SellerStore } from "@/lib/query/seller";
@@ -90,6 +92,7 @@ const STEPS = [
 
 function SellerOnboard() {
   const signedIn = useIsAuthenticated();
+  const me = useMe();
   const stores = useMyStores();
   const onboard = useOnboardSeller();
   const navigate = useNavigate();
@@ -111,6 +114,16 @@ function SellerOnboard() {
 
   if (!signedIn) return <SignInRequired />;
 
+  /*
+   * `POST /sellers/onboard` is in the server's `VERIFIED_ONLY_ACTIONS`, so an
+   * unverified account is refused — and until now it was refused *after*
+   * filling in the store name, the district and the map point. The rule is
+   * known before any of that, so it is said before any of that, and the code
+   * can be entered here rather than sending somebody to the profile screen to
+   * find it.
+   */
+  const unverified = isUnverified(me.data);
+
   const nameError =
     touched && form.store_name.trim().length < 2 ? "Do'kon nomini kiriting." : undefined;
   const districtError =
@@ -118,23 +131,32 @@ function SellerOnboard() {
   const pointError = coordinateProblem(point);
   const valid = !nameError && !districtError && !pointError && form.store_name && form.district;
 
-  async function submit(event: React.FormEvent) {
+  /**
+   * `mutate`, not `mutateAsync`: the rejected promise from `mutateAsync` had no
+   * catch, so every refusal — including the verification 403 above — showed the
+   * error *and* logged an unhandled rejection. The mutation's own error state is
+   * what the form renders, so the callback form is both shorter and complete.
+   */
+  function submit(event: React.FormEvent) {
     event.preventDefault();
     setTouched(true);
+    if (unverified || onboard.isPending) return;
     if (!form.store_name.trim() || !form.district.trim()) return;
     if (coordinateProblem(point)) return;
 
-    const seller = await onboard.mutateAsync({
-      store_name: form.store_name.trim(),
-      region: form.region,
-      district: form.district.trim(),
-      // Empty strings would be stored as empty strings; null says "not given".
-      address: form.address.trim() || null,
-      phone: form.phone.trim() || null,
-      description_uz: form.description_uz.trim() || null,
-      ...coordinatePayload(point),
-    });
-    if (seller) setCreated(seller);
+    onboard.mutate(
+      {
+        store_name: form.store_name.trim(),
+        region: form.region,
+        district: form.district.trim(),
+        // Empty strings would be stored as empty strings; null says "not given".
+        address: form.address.trim() || null,
+        phone: form.phone.trim() || null,
+        description_uz: form.description_uz.trim() || null,
+        ...coordinatePayload(point),
+      },
+      { onSuccess: (seller) => setCreated(seller) },
+    );
   }
 
   const error = onboard.error instanceof ApiError ? onboard.error.message : null;
@@ -142,10 +164,21 @@ function SellerOnboard() {
 
   return (
     <Page>
+      {/* Approval belongs in the first sentence somebody reads, not only in the
+          warning box beside the submit button — it decides whether this is worth
+          their afternoon. */}
       <PageTitle
         eyebrow="AVTOQISM"
         title="Do'kon ochish"
-        subtitle="Ro'yxatdan o'tish bepul. Komissiya faqat sotuvdan olinadi."
+        subtitle="Ro'yxatdan o'tish bepul, komissiya faqat sotuvdan olinadi. Yangi do'kon administrator tasdig'idan keyin katalogda ko'rinadi."
+      />
+
+      {/* Renders nothing for a verified account. For an unverified one it is the
+          whole reason the form below will not submit, so it goes first. */}
+      <VerificationPrompt
+        user={me.data}
+        onVerified={() => void me.refetch()}
+        className="mb-8 border border-warning/40 bg-warning/10 p-5"
       />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
@@ -198,7 +231,7 @@ function SellerOnboard() {
         {created ? (
           <StoreCreated seller={created} onFinish={() => void navigate({ to: "/seller" })} />
         ) : (
-          <form onSubmit={(event) => void submit(event)} className="space-y-4 lg:sticky lg:top-24">
+          <form onSubmit={submit} className="space-y-4 lg:sticky lg:top-24">
             <div className="border border-border bg-card p-5">
               <h2 className="type-h3 mb-1">Do'kon ma'lumotlari</h2>
               <p className="type-caption mb-5">
@@ -314,9 +347,19 @@ function SellerOnboard() {
                 </p>
               </div>
 
-              <Button type="submit" className="mt-4 w-full" disabled={onboard.isPending || !valid}>
+              <Button
+                type="submit"
+                className="mt-4 w-full"
+                disabled={onboard.isPending || !valid || unverified}
+              >
                 {onboard.isPending ? "Yuborilmoqda…" : "Do'kon ochish"}
               </Button>
+              {unverified && (
+                <p className="type-caption mt-2">
+                  Do'kon ochish uchun avval aloqa raqamingizni tasdiqlang — kodni shu sahifaning
+                  tepasidan kiritasiz. Formani hozir to'ldirib turishingiz mumkin.
+                </p>
+              )}
 
               <ul className="mt-4 space-y-1.5">
                 {[

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { formatClock, playableUrl } from "./util";
 import type { FeedVideo, WatchReport } from "@/lib/query/feed";
+import { prefersReducedMotion } from "@/lib/query/settings";
 import { cn } from "@/lib/utils";
 
 /** Below this, a clip that went past counts as skipped rather than watched. */
@@ -99,7 +100,10 @@ export function VideoStage({
     const element = elementRef.current;
     if (active) {
       startClock();
-      if (element) {
+      // Someone who asked for reduced motion gets the poster and the play
+      // button, not a clip that starts moving at them. CSS cannot pause a
+      // <video>, so the setting has to be read here or the toggle is a lie.
+      if (element && !prefersReducedMotion()) {
         const attempt = element.play();
         // Autoplay can be refused (a page the person has not interacted with);
         // the poster and the play button stay, which is the honest result.

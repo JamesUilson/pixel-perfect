@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+import {
+  mirrorPreference,
+  useAdoptServerVisualPreferences,
+  usePreferences,
+} from "@/lib/query/settings";
+
 export type Lang = "uz" | "ru";
 
 type Entry = { uz: string; ru: string };
@@ -233,9 +239,230 @@ export const dict = {
   "profile.settings": { uz: "Sozlamalar", ru: "Настройки" },
   "profile.language": { uz: "Til", ru: "Язык" },
   "profile.guest": { uz: "Mehmon", ru: "Гость" },
+  "profile.openSettings": { uz: "Sozlamalarni ochish", ru: "Открыть настройки" },
+
+  /* --- settings ------------------------------------------------------------
+   * This is the screen where the language is changed, so every string on it is
+   * translated: a Russian-speaking buyer who switches to Русский and is left
+   * looking at Uzbek section headings has been given a switch that lies.
+   */
+  "settings.title": { uz: "Sozlamalar", ru: "Настройки" },
+  "settings.subtitle": {
+    uz: "Ko'rinish, til, xavfsizlik va qurilmalar — hammasi bir joyda.",
+    ru: "Вид, язык, безопасность и устройства — всё в одном месте.",
+  },
+  "settings.saved": { uz: "Saqlandi", ru: "Сохранено" },
+  "settings.savedOnDevice": {
+    uz: "Bu yerdagi tanlov shu qurilmada saqlanadi.",
+    ru: "Выбор здесь сохраняется на этом устройстве.",
+  },
+  "settings.savedOnAccount": {
+    uz: "Bu yerdagi tanlov hisobingizga saqlanadi — boshqa qurilmalarda ham shunday bo'ladi.",
+    ru: "Выбор здесь сохраняется в аккаунте — на других устройствах будет так же.",
+  },
+
+  "settings.appearance": { uz: "Ko'rinish", ru: "Вид" },
+  "settings.appearanceSub": {
+    uz: "Ekran yorug'ligi kun bo'yi bir xil bo'lmaydi.",
+    ru: "Яркость экрана меняется в течение дня.",
+  },
+  "settings.theme": { uz: "Mavzu", ru: "Тема" },
+  "settings.themeLight": { uz: "Yorug'", ru: "Светлая" },
+  "settings.themeDark": { uz: "Tund", ru: "Тёмная" },
+  "settings.themeSystem": { uz: "Tizim bo'yicha", ru: "Как в системе" },
+  "settings.themeSystemHint": {
+    uz: "Qurilma sozlamasiga qarab o'zi almashadi.",
+    ru: "Переключается вслед за настройкой устройства.",
+  },
+  "settings.themeSystemNow": { uz: "Hozir", ru: "Сейчас" },
+
+  "settings.language": { uz: "Til", ru: "Язык" },
+  "settings.languageSub": {
+    uz: "Interfeys tili. Mahsulot nomlari sotuvchi kiritgan tilda qoladi.",
+    ru: "Язык интерфейса. Названия товаров остаются на языке продавца.",
+  },
+
+  "settings.a11y": { uz: "Maxsus imkoniyatlar", ru: "Специальные возможности" },
+  "settings.a11ySub": {
+    uz: "Har bir sozlama darhol ishlaydi — qayta yuklash kerak emas.",
+    ru: "Каждая настройка применяется сразу — перезагрузка не нужна.",
+  },
+  "settings.reduceMotion": { uz: "Harakatni kamaytirish", ru: "Меньше движения" },
+  "settings.reduceMotionSub": {
+    uz: "Animatsiya va o'tishlar o'chadi, videolar o'zidan boshlanmaydi.",
+    ru: "Анимации и переходы отключаются, видео не запускается само.",
+  },
+  "settings.largerText": { uz: "Yozuvni kattalashtirish", ru: "Крупный текст" },
+  "settings.largerTextSub": {
+    uz: "Butun interfeys bir pog'ona kattalashadi — matn ham, tugmalar ham.",
+    ru: "Весь интерфейс становится на шаг крупнее — и текст, и кнопки.",
+  },
+  "settings.highContrast": { uz: "Yuqori kontrast", ru: "Высокий контраст" },
+  "settings.highContrastSub": {
+    uz: "Chegaralar va ikkilamchi matn quyuqlashadi — quyoshda o'qish uchun.",
+    ru: "Границы и второстепенный текст темнее — чтобы читать на солнце.",
+  },
+
+  "settings.security": { uz: "Xavfsizlik", ru: "Безопасность" },
+  "settings.securitySub": {
+    uz: "Parol va tasdiqlangan aloqa ma'lumotlari.",
+    ru: "Пароль и подтверждённые контактные данные.",
+  },
+  "settings.password": { uz: "Parol", ru: "Пароль" },
+  "settings.passwordChange": { uz: "Parolni o'zgartirish", ru: "Изменить пароль" },
+  "settings.passwordCurrent": { uz: "Hozirgi parol", ru: "Текущий пароль" },
+  "settings.passwordNew": { uz: "Yangi parol", ru: "Новый пароль" },
+  "settings.passwordRepeat": { uz: "Yangi parolni takrorlang", ru: "Повторите новый пароль" },
+  "settings.passwordMismatch": { uz: "Parollar mos kelmadi.", ru: "Пароли не совпадают." },
+  "settings.passwordSame": {
+    uz: "Yangi parol eskisidan farq qilishi kerak.",
+    ru: "Новый пароль должен отличаться от старого.",
+  },
+  "settings.passwordChanged": { uz: "Parol o'zgartirildi.", ru: "Пароль изменён." },
+  "settings.passwordChangeSignsOut": {
+    uz: "Parol o'zgargach barcha qurilmalardan — shu brauzer ham — chiqarilasiz va yangi parol bilan qaytadan kirasiz.",
+    ru: "После смены пароля выход выполняется на всех устройствах, включая этот браузер — войдите с новым паролем.",
+  },
+  "settings.passwordChangedSignedOut": {
+    uz: "Parol o'zgartirildi. Barcha qurilmalardan chiqarildingiz — yangi parol bilan kiring.",
+    ru: "Пароль изменён. Выход выполнен на всех устройствах — войдите с новым паролем.",
+  },
+  "settings.passwordChangedAt": { uz: "Oxirgi o'zgartirilgan", ru: "Последнее изменение" },
+  "settings.passwordUnknownDate": { uz: "Ma'lum emas", ru: "Неизвестно" },
+
+  "settings.contacts": { uz: "Aloqa ma'lumotlari", ru: "Контактные данные" },
+  "settings.phone": { uz: "Telefon raqami", ru: "Номер телефона" },
+  "settings.email": { uz: "E-pochta", ru: "Эл. почта" },
+  "settings.verified": { uz: "Tasdiqlangan", ru: "Подтверждён" },
+  "settings.notVerified": { uz: "Tasdiqlanmagan", ru: "Не подтверждён" },
+  "settings.notSet": { uz: "Kiritilmagan", ru: "Не указан" },
+  "settings.change": { uz: "O'zgartirish", ru: "Изменить" },
+  "settings.add": { uz: "Qo'shish", ru: "Добавить" },
+  "settings.contactChangeHint": {
+    uz: "Yangi manzilga kod yuboriladi. Kod tasdiqlanmaguncha eski manzil ishlab turadi.",
+    ru: "На новый адрес придёт код. Пока код не подтверждён, работает старый адрес.",
+  },
+  "settings.contactChanged": {
+    uz: "Aloqa ma'lumoti o'zgartirildi.",
+    ru: "Контактные данные изменены.",
+  },
+  "settings.lastLogin": { uz: "Oxirgi kirish", ru: "Последний вход" },
+  "settings.activeSessions": { uz: "Faol seanslar", ru: "Активные сеансы" },
+
+  "settings.devices": { uz: "Ulangan qurilmalar", ru: "Подключённые устройства" },
+  "settings.devicesSub": {
+    uz: "Hisobingizga kirilgan har bir brauzer. Tanimasangiz — seansni tugatib, parolni o'zgartiring.",
+    ru: "Каждый браузер, из которого выполнен вход. Не узнаёте — завершите сеанс и смените пароль.",
+  },
+  "settings.thisDevice": { uz: "Shu qurilma", ru: "Это устройство" },
+  "settings.lastUsed": { uz: "Oxirgi faollik", ru: "Последняя активность" },
+  "settings.unknownDevice": { uz: "Noma'lum qurilma", ru: "Неизвестное устройство" },
+  "settings.unknownPlace": { uz: "Joyi aniqlanmadi", ru: "Место не определено" },
+  "settings.endSession": { uz: "Seansni tugatish", ru: "Завершить сеанс" },
+  "settings.endOthers": { uz: "Boshqa qurilmalardan chiqish", ru: "Выйти на других устройствах" },
+  "settings.endOthersConfirm": {
+    uz: "Shu brauzerdan boshqa hamma joyda hisobingiz yopiladi. Kirish uchun parol yana kerak bo'ladi.",
+    ru: "Аккаунт будет закрыт везде, кроме этого браузера. Для входа снова понадобится пароль.",
+  },
+  "settings.endOthersDone": {
+    uz: "Boshqa qurilmalardan chiqildi.",
+    ru: "Выход на других устройствах выполнен.",
+  },
+  "settings.noOtherDevices": {
+    uz: "Boshqa qurilma yo'q — faqat shu brauzer.",
+    ru: "Других устройств нет — только этот браузер.",
+  },
+
+  "settings.notifications": { uz: "Bildirishnomalar", ru: "Уведомления" },
+  "settings.notificationsSub": {
+    uz: "Nimani qaysi kanal orqali olishni tanlang.",
+    ru: "Выберите, что и по какому каналу получать.",
+  },
+  /* The five `NOTIFIABLE_KINDS`. The server sends the list; these name them.
+     A kind that arrives without a label here is shown by its own code rather
+     than hidden — a switch nobody can read still beats a switch nobody sees. */
+  "notify.ORDER_STATUS": { uz: "Buyurtma holati", ru: "Статус заказа" },
+  "notify.ORDER_STATUS.sub": {
+    uz: "Qabul qilindi, yig'ilmoqda, yo'lda, yetkazildi.",
+    ru: "Принят, собирается, в пути, доставлен.",
+  },
+  "notify.BACK_IN_STOCK": { uz: "Omborga tushdi", ru: "Снова в наличии" },
+  "notify.BACK_IN_STOCK.sub": {
+    uz: "Kuzatib qo'ygan mahsulot qaytib kelsa.",
+    ru: "Когда отслеживаемый товар снова появится.",
+  },
+  "notify.COMMENT": { uz: "Izohlar", ru: "Комментарии" },
+  "notify.COMMENT.sub": {
+    uz: "Videongizga izoh yozilsa yoki javob berilsa.",
+    ru: "Комментарий или ответ под вашим видео.",
+  },
+  "notify.FOLLOW": { uz: "Yangi obunachi", ru: "Новый подписчик" },
+  "notify.FOLLOW.sub": {
+    uz: "Do'koningizga yoki profilingizga obuna bo'lishsa.",
+    ru: "Подписка на ваш магазин или профиль.",
+  },
+  "notify.MODERATION": { uz: "Moderatsiya qarori", ru: "Решение модерации" },
+  "notify.MODERATION.sub": {
+    uz: "Video yoki do'kon tekshiruvdan o'tsa yoki rad etilsa.",
+    ru: "Видео или магазин прошли проверку либо отклонены.",
+  },
+
+  "settings.channel.in_app": { uz: "Ilovada", ru: "В приложении" },
+  "settings.channel.push": { uz: "Push", ru: "Push" },
+  "settings.channel.email": { uz: "E-pochta", ru: "Эл. почта" },
+  "settings.channel.sms": { uz: "SMS", ru: "SMS" },
+  "settings.smsNote": {
+    uz: "SMS har bir xabar uchun pulli, shuning uchun sukut bo'yicha o'chirilgan.",
+    ru: "SMS платные за каждое сообщение, поэтому по умолчанию отключены.",
+  },
+  "settings.pendingContact": {
+    uz: "Tasdiqlanmagan o'zgartirish",
+    ru: "Неподтверждённое изменение",
+  },
+  "settings.pendingContactSub": {
+    uz: "Kod kiritilmaguncha hisobingizdagi ma'lumot o'zgarmaydi.",
+    ru: "Пока код не введён, данные в аккаунте не меняются.",
+  },
+  "settings.resendCode": { uz: "Kodni qayta yuborish", ru: "Отправить код снова" },
+  "settings.devNote": { uz: "Ishlab chiqish rejimi", ru: "Режим разработки" },
+  "settings.sessionsEnded": { uz: "seans yakunlandi", ru: "сеансов завершено" },
+  "settings.closeAccountNoPassword": {
+    uz: "Tasdiqlashdan keyin hisob darhol yopiladi va barcha qurilmalardan chiqarilasiz.",
+    ru: "После подтверждения аккаунт закрывается сразу, и вы выходите на всех устройствах.",
+  },
+
+  "settings.notificationsAlways": {
+    uz: "Buyurtma cheki, to'lov va pul qaytarish xabarlari har doim yuboriladi — bu moliyaviy hujjat, uni o'chirib bo'lmaydi.",
+    ru: "Чек заказа, оплата и возврат отправляются всегда — это финансовый документ, его нельзя отключить.",
+  },
+
+  "settings.account": { uz: "Hisob", ru: "Аккаунт" },
+  "settings.accountSub": {
+    uz: "Chiqish va hisobni yopish.",
+    ru: "Выход и закрытие аккаунта.",
+  },
+  "settings.closeAccount": { uz: "Hisobni yopish", ru: "Закрыть аккаунт" },
+  "settings.closeAccountWhat": { uz: "Nima o'chadi", ru: "Что удаляется" },
+  "settings.closeAccountKept": { uz: "Nima saqlanadi", ru: "Что сохраняется" },
+  "settings.closeAccountConfirm": {
+    uz: "Hisobni yopish uchun parolingizni kiriting.",
+    ru: "Введите пароль, чтобы закрыть аккаунт.",
+  },
+  "settings.closeAccountDone": { uz: "Hisob yopildi.", ru: "Аккаунт закрыт." },
+  "settings.closeAccountReason": { uz: "Sabab", ru: "Причина" },
 } as unknown as Dict;
 
 const STORAGE_KEY = "avtoqism.lang";
+
+function storedLang(): Lang | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === "uz" || stored === "ru" ? stored : null;
+  } catch {
+    /* storage blocked — Uzbek stays the default */
+    return null;
+  }
+}
 
 const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
   lang: "uz",
@@ -246,12 +473,8 @@ export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("uz");
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "uz" || stored === "ru") setLangState(stored);
-    } catch {
-      /* storage blocked — Uzbek stays the default */
-    }
+    const stored = storedLang();
+    if (stored !== null) setLangState(stored);
   }, []);
 
   const value = useMemo(
@@ -264,12 +487,49 @@ export function LangProvider({ children }: { children: ReactNode }) {
         } catch {
           /* ignore */
         }
+        // The account remembers it too, so the next device starts in the right
+        // language — and `users.locale`, which decides the language of the SMS
+        // and the notifications the platform sends, moves with it server-side.
+        // Fire-and-forget: the switch has already happened here.
+        mirrorPreference({ language: l });
       },
     }),
     [lang],
   );
 
-  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
+  return (
+    <LangContext.Provider value={value}>
+      <AccountPreferences onLocale={setLangState} />
+      {children}
+    </LangContext.Provider>
+  );
+}
+
+/**
+ * The account's own stored appearance and language, adopted once.
+ *
+ * It lives here rather than in `__root.tsx` because `LangProvider` is already
+ * the one component mounted above every screen and inside the query client, and
+ * a second provider that exists only to run two effects would be a provider
+ * nobody reads. It renders nothing.
+ *
+ * Both adoptions follow the same rule: the account wins only on a device that
+ * has never been asked. Somebody who picked Russian on this laptop keeps Russian
+ * when they sign in to an account that says Uzbek — the screen they are looking
+ * at does not change under them.
+ */
+function AccountPreferences({ onLocale }: { onLocale: (lang: Lang) => void }) {
+  useAdoptServerVisualPreferences();
+  const prefs = usePreferences();
+  const language = prefs.data?.language;
+
+  useEffect(() => {
+    if (language !== "uz" && language !== "ru") return;
+    if (storedLang() !== null) return;
+    onLocale(language);
+  }, [language, onLocale]);
+
+  return null;
 }
 
 export function useLang() {

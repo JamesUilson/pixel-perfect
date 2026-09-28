@@ -87,6 +87,7 @@
 }
 
 :root {
+  color-scheme: light;
   --background: oklch(0.978 0.004 78);
   --foreground: oklch(0.19 0.012 255);
   --surface: oklch(1 0 0);
@@ -143,7 +144,24 @@
   --viz-axis: #6b6a66;
 }
 
-.dark {
+/*
+ * Dark, reached three ways.
+ *
+ *   - `.dark` on <html>, which `@custom-variant dark` and
+ *     `components/ui/chart.tsx` both key off, so the bootstrap keeps it in step;
+ *   - `[data-theme="dark"]`, the explicit choice from the settings screen;
+ *   - the system preference, in the media query below, for a visitor who chose
+ *     nothing — and for one with JavaScript off, who gets no attributes at all.
+ *
+ * The media query repeats these declarations rather than sharing them. Plain
+ * CSS has no way to reuse a selector list inside `@media`, and the alternatives
+ * — a second class the media query cannot add, or `light-dark()` across every
+ * token — would either not work or rewrite the approved palette. Change one
+ * copy, change the other.
+ */
+.dark,
+:root[data-theme="dark"] {
+  color-scheme: dark;
   --background: oklch(0.145 0.012 255);
   --foreground: oklch(0.975 0.003 80);
   --surface: oklch(0.195 0.012 255);
@@ -180,6 +198,50 @@
   --viz-6: #d55181;
   --viz-grid: #2b3138;
   --viz-axis: #a8a8a3;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* `:not([data-theme="light"])` is what makes an explicit light choice win
+     over the system preference. */
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --background: oklch(0.145 0.012 255);
+    --foreground: oklch(0.975 0.003 80);
+    --surface: oklch(0.195 0.012 255);
+    --surface-foreground: oklch(0.975 0.003 80);
+    --card: oklch(0.195 0.012 255);
+    --card-foreground: oklch(0.975 0.003 80);
+    --popover: oklch(0.195 0.012 255);
+    --popover-foreground: oklch(0.975 0.003 80);
+
+    --primary: oklch(0.64 0.19 32);
+    --primary-foreground: oklch(0.99 0.002 80);
+    --accent-electric: oklch(0.64 0.19 32);
+    --accent-electric-foreground: oklch(0.99 0.002 80);
+
+    --secondary: oklch(0.255 0.012 255);
+    --secondary-foreground: oklch(0.975 0.003 80);
+    --muted: oklch(0.255 0.012 255);
+    --muted-foreground: oklch(0.72 0.012 255);
+    --accent: oklch(0.27 0.016 40);
+    --accent-foreground: oklch(0.975 0.003 80);
+
+    --success: oklch(0.62 0.14 150);
+    --success-soft: oklch(0.28 0.05 150);
+    --border: oklch(1 0 0 / 12%);
+    --border-strong: oklch(1 0 0 / 22%);
+    --input: oklch(1 0 0 / 16%);
+
+    /* The same six hues re-stepped for the dark surface, not an inverted flip. */
+    --viz-1: #e85339;
+    --viz-2: #3987e5;
+    --viz-3: #199e70;
+    --viz-4: #c98500;
+    --viz-5: #9085e9;
+    --viz-6: #d55181;
+    --viz-grid: #2b3138;
+    --viz-axis: #a8a8a3;
+  }
 }
 
 @layer base {
@@ -343,12 +405,88 @@
   animation: rise 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* --- accessibility ------------------------------------------------------- *
+ * Three switches on the settings screen, and this is the whole of what they do.
+ * They are attributes on <html> rather than a class so that the inline bootstrap
+ * in `__root.tsx` can set them before the first paint, and so that a rule here
+ * reads as the preference it serves.
+ *
+ * The OS preference and the in-app switch are written as one selector list
+ * throughout: somebody who has asked their system for less motion has asked this
+ * app too, and should not have to ask twice.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+:root[data-reduce-motion] *,
+:root[data-reduce-motion] *::before,
+:root[data-reduce-motion] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* The two utilities whose whole purpose is movement stop moving, rather than
+   moving in 0.01ms — an instant 700ms zoom still jumps the layout. */
+:root[data-reduce-motion] .image-zoom:hover {
+  transform: none;
+}
+
+/* CSS can stop a transition; it cannot pause a <video>. A surface that plays by
+   itself reads the attribute instead — `prefersReducedMotion()` in
+   `lib/query/settings.ts` is that read, and it answers for the OS preference
+   too. */
+
+/*
+ * Larger text.
+ *
+ * The root font size, not a transform: every size in the app is in rem, so this
+ * scales the type, the spacing and the tap targets together, and the layout
+ * reflows instead of overflowing. 112.5% is 18px from 16px.
+ */
+:root[data-text-lg] {
+  font-size: 112.5%;
+}
+
+/*
+ * High contrast.
+ *
+ * Only the three tokens that are deliberately quiet in the approved palette —
+ * the two border steps and muted text. Nothing else is touched, so the screen
+ * is the same screen with its edges and its secondary text pushed up to a ratio
+ * that survives a sunlit windscreen.
+ */
+:root[data-high-contrast] {
+  --border: oklch(0.62 0.014 75);
+  --border-strong: oklch(0.42 0.014 75);
+  --muted-foreground: oklch(0.34 0.014 255);
+}
+
+:root[data-high-contrast].dark,
+:root[data-high-contrast][data-theme="dark"] {
+  --border: oklch(1 0 0 / 34%);
+  --border-strong: oklch(1 0 0 / 58%);
+  --muted-foreground: oklch(0.88 0.008 255);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-high-contrast]:not([data-theme="light"]) {
+    --border: oklch(1 0 0 / 34%);
+    --border-strong: oklch(1 0 0 / 58%);
+    --muted-foreground: oklch(0.88 0.008 255);
+  }
+}
+
+/* A dashed hairline is the first thing to disappear at high contrast. */
+:root[data-high-contrast] .border-dashed {
+  border-style: solid;
 }

@@ -148,6 +148,14 @@ export const qk = {
   adminVideoQueue: (filters: Record<string, unknown>) =>
     ["admin", "videos", "pending", filters] as const,
 
+  /* --- the account's own settings -----------------------------------------
+   * Under "me" with the rest of the signed-in person's things, so the same
+   * predicate that drops their cart and wallet on sign-out drops these too.
+   */
+  preferences: ["me", "preferences"] as const,
+  sessions: ["me", "sessions"] as const,
+  security: ["me", "security"] as const,
+
   /* --- the public feed -----------------------------------------------------
    * Every key here begins with "feed", so one predicate reaches the lot — and
    * it has to: a like lands on the same video in the scroller, in the detail

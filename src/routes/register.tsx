@@ -33,7 +33,7 @@ import {
   serverPasswordProblems,
 } from "@/components/avtoqism/auth/rules";
 import { ApiError } from "@/lib/api/client";
-import { useT } from "@/lib/i18n";
+import { useLang, useT } from "@/lib/i18n";
 import { useRegisterStart } from "@/lib/query/auth";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +48,7 @@ type Channel = "phone" | "email";
 
 function RegisterPage() {
   const t = useT();
+  const { lang } = useLang();
   const navigate = useNavigate();
   const start = useRegisterStart();
 
@@ -119,6 +120,10 @@ function RegisterPage() {
         full_name: fullName.trim(),
         region,
         ...(city.trim() === "" ? {} : { city: city.trim() }),
+        // The language they are reading this form in. `RegisterIn.locale`
+        // defaults to "uz" server-side, so leaving it out meant every Russian
+        // speaker's account — and every message sent to it — was in Uzbek.
+        locale: lang,
         accept_terms: acceptTerms,
       },
       {
@@ -159,6 +164,28 @@ function RegisterPage() {
         <div className="mt-8 border border-border bg-card p-4">
           <p className="type-label text-muted-foreground">Tasdiqlanmagan hisob nima qila olmaydi</p>
           <UnverifiedLimits className="mt-2" />
+        </div>
+
+        {/*
+         * `/auth/register/start` has already created the account by the time
+         * this step is on screen, and an unverified account may sign in and
+         * browse. Without saying so, somebody whose SMS never arrives is stuck
+         * on a code box with no way forward and no idea they have an account at
+         * all — and the next thing they do is register again with another
+         * number.
+         */}
+        <div className="mt-4 border border-border bg-muted/40 p-4">
+          <p className="text-sm font-semibold">Kod kelmadi va kuta olmayapsizmi?</p>
+          <p className="type-caption mt-1">
+            Hisobingiz allaqachon yaratilgan. Kirib katalogni ko'rishingiz mumkin, tasdiqlashni esa
+            keyinroq profil sahifasidan yakunlaysiz — qaytadan ro'yxatdan o'tish kerak emas.
+          </p>
+          <Link
+            to="/login"
+            className="mt-3 inline-flex border border-border-strong bg-card px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
+          >
+            {t("auth.login")}
+          </Link>
         </div>
       </Page>
     );
@@ -310,6 +337,23 @@ function RegisterPage() {
           {t("auth.login")}
         </Link>
       </p>
+
+      {/* One account, two uses: a seller registers here and opens the store
+          afterwards. Saying so is the only way somebody who came to sell finds
+          the door, and it sets the expectation about approval up front. */}
+      <div className="mt-8 border-t border-border pt-6">
+        <p className="text-sm font-semibold">Sotmoqchimisiz?</p>
+        <p className="type-caption mt-1">
+          Shu hisob bilan do'kon ochasiz. Do'kon administrator tasdig'idan keyin katalogda ko'rinadi
+          — ro'yxatdan o'tish bepul, komissiya faqat sotuvdan olinadi.
+        </p>
+        <Link
+          to="/seller/onboard"
+          className="type-caption mt-2 inline-block font-semibold text-primary underline underline-offset-4"
+        >
+          Sotuvchi bo'lish haqida
+        </Link>
+      </div>
     </Page>
   );
 }

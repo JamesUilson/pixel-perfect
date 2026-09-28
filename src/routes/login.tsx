@@ -162,12 +162,25 @@ function LoginPage() {
         </button>
       </form>
 
-      <p className="type-caption mt-6">
-        {t("auth.noAccount")}{" "}
-        <Link to="/register" className="font-semibold text-primary">
+      {/*
+       * Registration was a caption here, at the same weight as a hint under an
+       * input. This is the screen a visitor lands on from the header, so for
+       * everybody who has no account yet it is the wrong screen — and the way
+       * off it has to look like a way off it, not like small print.
+       */}
+      <div className="mt-8 border border-border bg-card p-5">
+        <p className="text-sm font-semibold">{t("auth.noAccount")}</p>
+        <p className="type-caption mt-1">
+          Telefon raqami yoki e-pochta bilan bir daqiqada ochiladi. Tasdiqlash uchun olti xonali kod
+          yuboriladi.
+        </p>
+        <Link
+          to="/register"
+          className="mt-4 inline-flex w-full items-center justify-center border border-border-strong bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:bg-muted"
+        >
           {t("auth.register")}
         </Link>
-      </p>
+      </div>
     </Page>
   );
 }

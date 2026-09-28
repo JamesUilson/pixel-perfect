@@ -19,6 +19,7 @@ import {
   LogIn,
   LogOut,
   Receipt,
+  Settings,
   ShieldCheck,
   Store,
   UserRound,
@@ -27,6 +28,7 @@ import {
 
 import { useLogout, useMe } from "@/lib/query/auth";
 import { useMyStores } from "@/lib/query/seller";
+import { useIsAuthenticated } from "@/lib/query/session";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +37,7 @@ const STAFF = ["SUPER_ADMIN", "MODERATOR", "CATALOG_MANAGER", "SUPPORT", "FINANC
 
 export function AccountMenu({ className }: { className?: string | undefined }) {
   const t = useT();
+  const signedIn = useIsAuthenticated();
   const me = useMe();
   const stores = useMyStores();
   const logout = useLogout();
@@ -59,18 +62,43 @@ export function AccountMenu({ className }: { className?: string | undefined }) {
     };
   }, [open]);
 
+  /*
+   * Branching on `me.data` alone was wrong in both directions: a signed-in
+   * person saw the sign-in button for as long as `/auth/me` took to answer, and
+   * a visitor whose only way to register was a link on the sign-in page had to
+   * find that page from an unlabelled icon. The token decides, and the header
+   * offers both doors.
+   */
+  if (!signedIn) {
+    return (
+      <div className={cn("flex items-center gap-2", className)}>
+        <Link
+          to="/login"
+          className="inline-flex h-11 items-center border border-border px-3 text-sm font-semibold transition-colors hover:border-border-strong"
+        >
+          <LogIn className="size-4 lg:mr-2" />
+          <span className="hidden lg:inline">{t("auth.login")}</span>
+        </Link>
+        {/* Hidden on a phone, where the bottom bar's Profil tab leads to the
+            same two buttons and the header has no room for a second one. */}
+        <Link
+          to="/register"
+          className="hidden h-11 items-center bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 lg:inline-flex"
+        >
+          {t("auth.register")}
+        </Link>
+      </div>
+    );
+  }
+
+  // Signed in, but the account has not loaded yet: hold the space rather than
+  // swapping one control for another as it arrives.
   if (!me.data) {
     return (
-      <Link
-        to="/login"
-        className={cn(
-          "grid size-11 place-items-center border border-border transition-colors hover:border-border-strong",
-          className,
-        )}
-        aria-label={t("auth.login")}
-      >
-        <LogIn className="size-4" />
-      </Link>
+      <div
+        aria-hidden
+        className={cn("h-11 w-11 animate-pulse border border-border bg-muted lg:w-32", className)}
+      />
     );
   }
 
@@ -157,6 +185,9 @@ export function AccountMenu({ className }: { className?: string | undefined }) {
             </MenuLink>
             <MenuLink to="/garage" icon={CarFront} onNavigate={() => setOpen(false)}>
               {t("nav.garage")}
+            </MenuLink>
+            <MenuLink to="/settings" icon={Settings} onNavigate={() => setOpen(false)}>
+              {t("settings.title")}
             </MenuLink>
           </div>
 
