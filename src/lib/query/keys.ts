@@ -167,4 +167,31 @@ export const qk = {
   feedReplies: (commentId: string) => ["feed", "replies", commentId] as const,
   creator: (handle: string) => ["feed", "creator", handle] as const,
   creatorGrid: (handle: string, tab: string) => ["feed", "creator", handle, "grid", tab] as const,
+
+  /* --- stores near a point -------------------------------------------------
+   * Both keys begin with "sellers", so the predicate that drops the seller
+   * directory reaches these too.
+   *
+   * `point` is the caller's coordinates already rounded to a fixed number of
+   * decimals, or null when they have not shared any. It is part of the key on
+   * purpose: the rating fallback and the distance list are two different
+   * answers, not one list with a flag, and caching them under one key would
+   * show yesterday's rating order with today's distances written over it.
+   */
+  nearbySellers: (point: string | null, radiusKm: number, limit: number) =>
+    ["sellers", "nearby", point, radiusKm, limit] as const,
+  sellerMap: (point: string | null, radiusKm: number) =>
+    ["sellers", "map", point, radiusKm] as const,
+
+  /* --- the account's own channels and kept clips ---------------------------
+   * Under "me" with the cart, the wallet and the addresses, so the one
+   * predicate that drops the signed-in person's things on sign-out drops these
+   * too — these lists are nobody else's to read, and there is no endpoint that
+   * would serve them for another account.
+   *
+   * The page number is part of the key because these are offset pages: page
+   * two is a different answer, not a filter over page one.
+   */
+  following: (page: number) => ["me", "following", page] as const,
+  savedVideos: (page: number) => ["me", "saved-videos", page] as const,
 } as const;

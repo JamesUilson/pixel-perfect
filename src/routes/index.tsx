@@ -1,14 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronRight, MapPin, ShieldCheck, Star, Truck } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 
-import cobalt from "@/assets/car-cobalt.jpg";
-import { HomeSlider } from "@/components/avtoqism/HomeSlider";
+import { HomeSlider, type LocalSlide } from "@/components/avtoqism/HomeSlider";
 import { Page, SectionHead } from "@/components/avtoqism/Page";
 import { ProductCard } from "@/components/avtoqism/ProductCard";
 import { ErrorState, ProductGridSkeleton } from "@/components/avtoqism/States";
+import { HeroSlide } from "@/components/avtoqism/home/HeroSlide";
+import { NearbyStores } from "@/components/avtoqism/home/NearbyStores";
 import { useLang, useT } from "@/lib/i18n";
-import { useCategories, useProducts, useSellers } from "@/lib/query/catalog";
+import { useCategories, useProducts } from "@/lib/query/catalog";
 import { useActiveVehicle } from "@/lib/query/garage";
+
+/**
+ * The hero, as the band's first slide.
+ *
+ * A module constant rather than an object built in the component: `HomeSlider`
+ * keys its panel list off this, and a fresh object every render would rebuild
+ * that list for nothing. It carries no props of its own — `HeroSlide` reads the
+ * garage itself — so there is nothing here to close over.
+ */
+const HERO_SLIDE: LocalSlide = {
+  id: "hero",
+  label: "Asosiy taklif",
+  render: (active) => <HeroSlide active={active} />,
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,74 +55,14 @@ function Home() {
     sort: activeVehicle ? "relevance" : "popular",
   });
   const categories = useCategories();
-  const sellers = useSellers();
-
-  const title = activeVehicle
-    ? `${activeVehicle.variant.display_name.split(" ").slice(0, 2).join(" ")}`
-    : t("home.question");
 
   return (
     <Page>
-      {/* --- ad slot: campaigns and house banners, already merged by the API - */}
-      <HomeSlider />
-
-      {/* --- hero ---------------------------------------------------------- */}
-      <section className="grid items-center gap-8 pb-16 lg:grid-cols-[0.8fr_1.2fr] lg:pb-24">
-        <div className="enter-rise flex flex-col justify-center">
-          <p className="type-label mb-4 text-primary">
-            {activeVehicle ? "Sizning avtomobilingiz" : "AVTOQISM"}
-          </p>
-          <h1 className="type-display">{title}</h1>
-          <p className="mt-5 text-lg text-muted-foreground">
-            {activeVehicle
-              ? `${activeVehicle.year} · ${activeVehicle.variant.engine?.displacement_l ?? ""} · ${
-                  activeVehicle.variant.transmission === "AUTOMATIC" ? "Avtomat" : "Mexanika"
-                }`
-              : t("home.noCarSub")}
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/garage"
-              className="inline-flex items-center gap-2 bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              {activeVehicle ? t("home.openGarage") : t("home.addCar")}
-              <ArrowRight className="size-4" />
-            </Link>
-            <Link
-              to="/marketplace"
-              className="inline-flex items-center gap-2 border border-border-strong bg-card px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-muted"
-            >
-              {t("nav.market")}
-            </Link>
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-border pt-5 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-2">
-              <ShieldCheck className="size-5 text-success" /> {t("common.warranty")}
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <Truck className="size-5 text-primary" /> {t("common.delivery")}
-            </span>
-          </div>
-        </div>
-
-        <div className="relative min-h-[320px] overflow-hidden bg-muted lg:min-h-[520px]">
-          <img
-            src={cobalt}
-            alt={activeVehicle?.variant.display_name ?? "Chevrolet Cobalt"}
-            className="size-full object-cover"
-          />
-          {activeVehicle && (
-            <div className="absolute bottom-4 left-4 bg-background px-4 py-3 shadow-sm">
-              <p className="type-label text-muted-foreground">{t("garage.active")}</p>
-              <p className="mt-1 text-sm font-semibold">
-                {activeVehicle.variant.display_name} · {activeVehicle.year}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* --- the band ------------------------------------------------------
+       * One rotating strip, not two stacked ones: the hero is the first slide
+       * and the API's merged campaigns and house banners are the rest.
+       */}
+      <HomeSlider leading={HERO_SLIDE} />
 
       {/* --- personalised grid --------------------------------------------- */}
       <section className="border-t border-border py-14">
@@ -176,43 +131,12 @@ function Home() {
         )}
       </section>
 
-      {/* --- sellers --------------------------------------------------------- */}
-      <section className="border-t border-border py-14">
-        <SectionHead eyebrow="Yaqiningizda" title={t("home.nearby")} />
-        {sellers.isPending ? (
-          <div className="grid gap-px bg-border md:grid-cols-3">
-            {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="h-44 animate-pulse bg-card" />
-            ))}
-          </div>
-        ) : sellers.isError ? (
-          <ErrorState error={sellers.error} onRetry={() => void sellers.refetch()} compact />
-        ) : (
-          <div className="grid gap-px bg-border md:grid-cols-3">
-            {sellers.data.slice(0, 6).map((s) => (
-              <div key={s.id} className="bg-background p-6">
-                <div className="flex items-start justify-between">
-                  <div className="grid size-11 place-items-center rounded-full bg-foreground text-xs font-bold text-background">
-                    {s.store_name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-semibold">
-                    <Star className="size-4 fill-primary text-primary" />
-                    {Number(s.rating_avg).toFixed(1)}
-                  </span>
-                </div>
-                <h3 className="type-h3 mt-8">{s.store_name}</h3>
-                <p className="type-caption mt-2 flex items-center gap-1">
-                  <MapPin className="size-4" />
-                  {s.district}, {s.region}
-                </p>
-                <p className="type-caption mt-1">
-                  {s.rating_count} {t("common.reviews").toLowerCase()}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* --- stores near the visitor ---------------------------------------
+       * Owns its own data, its own permission prompt and its own map, because
+       * all three are one question and splitting them across the route would
+       * put a geolocation call in a component that renders on every visit.
+       */}
+      <NearbyStores />
     </Page>
   );
 }

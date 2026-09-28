@@ -8,6 +8,8 @@ import { SignInRequired } from "@/components/avtoqism/SignInRequired";
 import { ErrorState } from "@/components/avtoqism/States";
 import { StatTile, num } from "@/components/avtoqism/panel/Charts";
 import { ExportButton } from "@/components/avtoqism/panel/Widgets";
+import { FollowingSection } from "@/components/avtoqism/account/FollowingSection";
+import { SavedVideosSection } from "@/components/avtoqism/account/SavedVideosSection";
 import { VerificationPrompt } from "@/components/avtoqism/auth/VerificationPrompt";
 import { AddressBook } from "@/components/avtoqism/delivery/AddressBook";
 import { useIsAuthenticated } from "@/lib/query/session";
@@ -235,6 +237,18 @@ function Profile() {
           </>
         )}
       </section>
+
+      {/* --- the feed side of this account ------------------------------------
+          Both lists are `/me/...`: they are this person's own and there is no
+          endpoint that would serve them for anybody else, so the personal
+          cabinet is where they belong. */}
+      <div className="mt-12">
+        <FollowingSection />
+      </div>
+
+      <div className="mt-12">
+        <SavedVideosSection />
+      </div>
 
       {/* --- saved delivery addresses ---------------------------------------- */}
       <section className="mt-12">

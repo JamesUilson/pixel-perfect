@@ -13,7 +13,7 @@
  * unverified sign-in lands on the verification prompt right here.
  */
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import { Loader2, Store } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -26,7 +26,19 @@ import type { AccountUser } from "@/lib/query/auth";
 import { useLogin } from "@/lib/query/auth";
 import { cn } from "@/lib/utils";
 
+/**
+ * Where to go once the session exists.
+ *
+ * Deliberately a closed set rather than a free-form path: an open redirect
+ * parameter on a sign-in page is how somebody gets bounced to a lookalike
+ * screen with a live session in hand. Today the seller path is the one screen
+ * that sends people here and wants them back.
+ */
+type LoginSearch = { next?: "/register/seller" | undefined };
+
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>): LoginSearch =>
+    search["next"] === "/register/seller" ? { next: "/register/seller" } : {},
   head: () => ({
     meta: [{ title: "Kirish — AVTOQISM" }, { name: "robots", content: "noindex" }],
   }),
@@ -36,6 +48,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const t = useT();
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const login = useLogin();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +63,12 @@ function LoginPage() {
     if (raw === "" || !looksLikePhone(raw)) return null;
     return normaliseUzPhone(raw);
   }, [identifier]);
+
+  /** Written out per destination: `to` is a literal route path, not a string. */
+  const goOn = () => {
+    if (next === "/register/seller") void navigate({ to: "/register/seller" });
+    else void navigate({ to: "/" });
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +87,7 @@ function LoginPage() {
             return;
           }
           toast.success(t("auth.login"));
-          void navigate({ to: "/" });
+          goOn();
         },
         onError: (error) =>
           setFormError(error instanceof ApiError ? error.message : t("error.generic")),
@@ -89,7 +108,7 @@ function LoginPage() {
             user={unverified}
             onVerified={() => {
               toast.success("Hisobingiz tasdiqlandi.");
-              void navigate({ to: "/" });
+              goOn();
             }}
           />
         </div>
@@ -189,6 +208,30 @@ function LoginPage() {
           className="mt-4 inline-flex w-full items-center justify-center border border-border-strong bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:bg-muted"
         >
           {t("auth.register")}
+        </Link>
+      </div>
+
+      {/*
+       * Selling was a clause inside the registration paragraph, which is how a
+       * shop owner arriving here ended up opening a buyer's account and finding
+       * the store form days later. It is its own door now, and it says where
+       * the door leads — including the review at the end, which is the part
+       * worth knowing before rather than after.
+       */}
+      <div className="mt-4 border border-border bg-card p-5">
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <Store className="size-4 text-primary" aria-hidden />
+          Sotmoqchimisiz?
+        </p>
+        <p className="type-caption mt-1">
+          Sotuvchi yo'li alohida: hisob, tasdiqlash va do'kon ma'lumotlari bitta sahifada ketma-ket
+          boriladi. Yangi do'kon administrator ko'rigidan o'tgach katalogda ko'rinadi.
+        </p>
+        <Link
+          to="/register/seller"
+          className="mt-4 inline-flex w-full items-center justify-center border border-border-strong bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:bg-muted"
+        >
+          Sotuvchi sifatida ro'yxatdan o'tish
         </Link>
       </div>
     </Page>

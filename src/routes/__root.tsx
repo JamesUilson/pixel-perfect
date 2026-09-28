@@ -167,7 +167,12 @@ if(p.highContrast)r.setAttribute("data-high-contrast","");
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="uz">
+    // The bootstrap below rewrites this element's class, style and data-*
+    // before React hydrates — that is the entire point of it, and it is the
+    // one place in the app where the client is *supposed* to differ from the
+    // server. Without this React compares the two, finds attributes it did not
+    // render, and logs a hydration mismatch on every single page load.
+    <html lang="uz" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
         <HeadContent />

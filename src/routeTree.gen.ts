@@ -36,6 +36,7 @@ import { Route as GarageAddRouteImport } from './routes/garage.add'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
+import { Route as RegisterSellerRouteImport } from './routes/register_.seller'
 import { Route as SellerIndexRouteImport } from './routes/seller.index'
 import { Route as SellerAdsRouteImport } from './routes/seller.ads'
 import { Route as SellerFeedRouteImport } from './routes/seller.feed'
@@ -184,6 +185,11 @@ const ProductProductIdRoute = ProductProductIdRouteImport.update({
   path: '/product/$productId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterSellerRoute = RegisterSellerRouteImport.update({
+  id: '/register_/seller',
+  path: '/register/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellerIndexRoute = SellerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/register/seller': typeof RegisterSellerRoute
   '/seller/ads': typeof SellerAdsRoute
   '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
@@ -309,6 +316,7 @@ export interface FileRoutesByTo {
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/register/seller': typeof RegisterSellerRoute
   '/seller/ads': typeof SellerAdsRoute
   '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
@@ -351,6 +359,7 @@ export interface FileRoutesById {
   '/garage/add': typeof GarageAddRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/register_/seller': typeof RegisterSellerRoute
   '/seller/ads': typeof SellerAdsRoute
   '/seller/feed': typeof SellerFeedRoute
   '/seller/finance': typeof SellerFinanceRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/register/seller'
     | '/seller/ads'
     | '/seller/feed'
     | '/seller/finance'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/register/seller'
     | '/seller/ads'
     | '/seller/feed'
     | '/seller/finance'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/garage/add'
     | '/orders/$orderId'
     | '/product/$productId'
+    | '/register_/seller'
     | '/seller/ads'
     | '/seller/feed'
     | '/seller/finance'
@@ -508,6 +520,7 @@ export interface RootRouteChildren {
   GarageAddRoute: typeof GarageAddRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
+  RegisterSellerRoute: typeof RegisterSellerRoute
   SellerOnboardRoute: typeof SellerOnboardRoute
   GarageIndexRoute: typeof GarageIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
@@ -704,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register_/seller': {
+      id: '/register_/seller'
+      path: '/register/seller'
+      fullPath: '/register/seller'
+      preLoaderRoute: typeof RegisterSellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seller/': {
       id: '/seller/'
       path: '/'
@@ -873,6 +893,7 @@ const rootRouteChildren: RootRouteChildren = {
   GarageAddRoute: GarageAddRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductProductIdRoute: ProductProductIdRoute,
+  RegisterSellerRoute: RegisterSellerRoute,
   SellerOnboardRoute: SellerOnboardRoute,
   GarageIndexRoute: GarageIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
