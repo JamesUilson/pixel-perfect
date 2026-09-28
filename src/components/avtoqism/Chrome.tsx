@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 
 import { AccountMenu } from "./AccountMenu";
-import { useLang, useT } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 import { useCart } from "@/lib/query/commerce";
 import { useActiveVehicle } from "@/lib/query/garage";
 import { cn } from "@/lib/utils";
@@ -29,28 +29,6 @@ export function Brand({ inverse = false }: { inverse?: boolean }) {
     >
       AVTO<span className="text-primary">QISM</span>
     </Link>
-  );
-}
-
-function LangSwitch() {
-  const { lang, setLang } = useLang();
-  return (
-    <div className="inline-flex items-center border border-border p-0.5">
-      {(["uz", "ru"] as const).map((l) => (
-        <button
-          key={l}
-          type="button"
-          onClick={() => setLang(l)}
-          aria-pressed={lang === l}
-          className={cn(
-            "px-2 py-1 text-[11px] font-bold uppercase transition-colors",
-            lang === l ? "bg-foreground text-background" : "text-muted-foreground",
-          )}
-        >
-          {l}
-        </button>
-      ))}
-    </div>
   );
 }
 
@@ -129,16 +107,26 @@ export function TopBar() {
               {activeVehicle.year}
             </Link>
           )}
-          <LangSwitch />
-
+          {/*
+           * The cart appears here only from `lg` up, which is exactly where the
+           * bottom bar — the phone's cart — is hidden. Below that the two were
+           * the same button twice. A guest has a cart too (the API carries one
+           * on `X-Cart-Token`), so this cannot move behind the account menu:
+           * a signed-out desktop visitor would then have no way to it at all.
+           */}
           <Link
             to="/cart"
-            className="relative grid size-11 place-items-center border border-border transition-colors hover:border-border-strong"
-            aria-label={t("nav.cart")}
+            className="relative hidden size-11 place-items-center border border-border transition-colors hover:border-border-strong lg:grid"
+            aria-label={
+              itemCount > 0 ? `${t("nav.cart")} — ${itemCount} ta mahsulot` : t("nav.cart")
+            }
           >
             <ShoppingBag className="size-4" />
             {itemCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
+              <span
+                aria-hidden
+                className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground"
+              >
                 {itemCount}
               </span>
             )}
@@ -196,6 +184,7 @@ export function BottomNav() {
             <Link
               key={item.to}
               to={item.to}
+              aria-label={item.badge > 0 ? `${item.label} — ${item.badge} ta mahsulot` : undefined}
               className={cn(
                 "relative flex min-h-12 flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold transition-colors",
                 active ? "text-primary" : "text-muted-foreground",
@@ -203,7 +192,10 @@ export function BottomNav() {
             >
               <item.icon className="size-5" strokeWidth={active ? 2.4 : 1.9} />
               {item.badge > 0 && (
-                <span className="absolute right-[22%] top-1 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                <span
+                  aria-hidden
+                  className="absolute right-[22%] top-1 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground"
+                >
                   {item.badge}
                 </span>
               )}

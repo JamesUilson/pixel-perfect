@@ -23,12 +23,13 @@ const bad = (name, detail = "") => {
   console.log(`  ✗ ${name}  — ${detail}`);
 };
 
-async function api(path, { method = "GET", token, body } = {}) {
+async function api(path, { method = "GET", token, body, headers } = {}) {
   const response = await fetch(`${API}${path}`, {
     method,
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(headers ?? {}),
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
@@ -47,11 +48,12 @@ function phone() {
 }
 
 /** A fresh verified buyer, and their password, for the security tests. */
-async function freshBuyer() {
+async function freshBuyer(deviceHeader = undefined) {
   const number = phone();
   const password = "Moshina7Qism";
   const created = await api("/auth/register", {
     method: "POST",
+    headers: deviceHeader,
     body: {
       phone: number,
       password,
@@ -64,6 +66,7 @@ async function freshBuyer() {
   if (created.status !== 201) throw new Error(`register: ${created.status}`);
   const verified = await api("/auth/register/verify", {
     method: "POST",
+    headers: deviceHeader,
     body: { identifier: number, code: created.body.verification.debug_code },
   });
   if (verified.status !== 200) throw new Error(`verify: ${verified.status}`);
@@ -203,6 +206,41 @@ try {
   wrongCurrent.status >= 400
     ? ok("CURRENT PASSWORD REQUIRED", `${wrongCurrent.status}`)
     : bad("CURRENT PASSWORD REQUIRED", "it changed without the current one");
+
+  // ---- one browser is one device ---------------------------------------------
+  //: The complaint that started this: signing in from the same laptop on four
+  //: days listed four devices. A session is a refresh-token family and signing
+  //: in mints a new one, so they stacked — and every earlier token stayed live
+  //: while the browser had already thrown it away.
+  //: The same user agent for both ids on purpose: two identical Chrome
+  //: installs really do send the same string, and the device id is what has to
+  //: tell them apart.
+  const asDevice = (id) => ({ "X-Device-Id": id, "user-agent": "E2E/1.0 Chrome" });
+  const device = await freshBuyer(asDevice("e2e-laptop"));
+  async function signInAs(id) {
+    const response = await fetch(`${API}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...asDevice(id) },
+      body: JSON.stringify({ identifier: device.phone, password: device.password }),
+    });
+    return (await response.json()).tokens;
+  }
+
+  let latest = null;
+  for (let i = 0; i < 3; i++) latest = await signInAs("e2e-laptop");
+  const oneDevice = await api("/me/sessions", { token: latest.access_token });
+  const laptop = oneDevice.body?.sessions ?? [];
+  laptop.length === 1 && laptop[0].is_current
+    ? ok("ONE BROWSER IS ONE DEVICE", "three sign-ins, one row")
+    : bad("ONE BROWSER IS ONE DEVICE", `${laptop.length} rows`);
+
+  //: A genuinely different browser is still its own device — collapsing on the
+  //: user agent would have merged these two, since they send the same string.
+  const second = await signInAs("e2e-phone");
+  const two = await api("/me/sessions", { token: second.access_token });
+  two.body?.sessions?.length === 2
+    ? ok("A SECOND BROWSER IS STILL SEPARATE", "two devices, not merged")
+    : bad("A SECOND BROWSER IS STILL SEPARATE", `${two.body?.sessions?.length} rows`);
 
   // ---- forgetting a password --------------------------------------------------
   //: Login locks an account after repeated failures, so until this screen

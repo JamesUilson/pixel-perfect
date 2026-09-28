@@ -10,6 +10,7 @@
  */
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 
 import { ErrorState, LineSkeleton } from "@/components/avtoqism/States";
 import {
@@ -20,6 +21,13 @@ import {
   num,
 } from "@/components/avtoqism/panel/Charts";
 import { PanelSection } from "@/components/avtoqism/panel/PanelShell";
+import {
+  CardEntry,
+  EMPTY_CARD_DRAFT,
+  cardDraftIsValid,
+  type CardDraft,
+} from "@/components/avtoqism/payment/CardEntry";
+import { cardDigits, expiryLabel } from "@/components/avtoqism/payment/card-brand";
 import { useSellerId } from "@/components/avtoqism/panel/SellerContext";
 import {
   Button,
@@ -83,19 +91,6 @@ const METHOD_STATUS_UZ: Record<
   REVOKED: { label: "O'chirilgan", tone: "neutral" },
   FAILED: { label: "Bloklangan", tone: "critical" },
 };
-
-/** Groups of four while typing, so the eye can check the number against the card. */
-function groupCardNumber(raw: string): string {
-  const digits = raw.replace(/\D/g, "").slice(0, 19);
-  const groups = digits.match(/.{1,4}/g);
-  return groups ? groups.join(" ") : "";
-}
-
-function expiryLabel(month: number | null | undefined, year: number | null | undefined): string {
-  if (!month || !year) return "";
-  const mm = month < 10 ? `0${month}` : String(month);
-  return `${mm}/${String(year).slice(-2)}`;
-}
 
 const LEDGER_KIND_UZ: Record<string, string> = {
   ORDER_CAPTURE: "To'lov",
@@ -501,6 +496,7 @@ function CardsSection({
                       <Button
                         size="sm"
                         variant="danger"
+                        className="min-h-11"
                         disabled={revokeBusy}
                         onClick={() =>
                           revoke.mutate(method.id, { onSuccess: () => setConfirmingId(null) })
@@ -508,7 +504,12 @@ function CardsSection({
                       >
                         {revokeBusy ? "O'chirilmoqda…" : "Ha, o'chirilsin"}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setConfirmingId(null)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="min-h-11"
+                        onClick={() => setConfirmingId(null)}
+                      >
                         Bekor qilish
                       </Button>
                     </div>
@@ -517,7 +518,11 @@ function CardsSection({
                 ) : (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {!method.is_payable && method.status === "PENDING_VERIFICATION" && (
-                      <Button size="sm" onClick={() => setVerifyingId(method.id)}>
+                      <Button
+                        size="sm"
+                        className="min-h-11"
+                        onClick={() => setVerifyingId(method.id)}
+                      >
                         Tasdiqlash
                       </Button>
                     )}
@@ -525,6 +530,7 @@ function CardsSection({
                       <Button
                         size="sm"
                         variant="outline"
+                        className="min-h-11"
                         disabled={defaultBusy}
                         onClick={() => makeDefault.mutate(method.id)}
                       >
@@ -532,7 +538,12 @@ function CardsSection({
                       </Button>
                     )}
                     {method.status !== "REVOKED" && (
-                      <Button size="sm" variant="danger" onClick={() => setConfirmingId(method.id)}>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        className="min-h-11"
+                        onClick={() => setConfirmingId(method.id)}
+                      >
                         O'chirish
                       </Button>
                     )}
@@ -562,28 +573,23 @@ function CardsSection({
  */
 function AddCardFlow({ sellerId, onDone }: { sellerId: string; onDone: () => void }) {
   const add = useAddCard(sellerId);
-  const thisYear = new Date().getFullYear();
 
-  const [number, setNumber] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-  const [holder, setHolder] = useState("");
+  const [draft, setDraft] = useState<CardDraft>(EMPTY_CARD_DRAFT);
   const [makeDefault, setMakeDefault] = useState(false);
   const [pendingMethodId, setPendingMethodId] = useState<string | null>(null);
   const [devCode, setDevCode] = useState<string | null>(null);
 
-  const digits = number.replace(/\D/g, "");
-  const valid = digits.length >= 12 && digits.length <= 19;
+  const valid = cardDraftIsValid(draft);
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!valid || add.isPending) return;
     add.mutate(
       {
-        number: digits,
-        expires_month: month === "" ? null : Number(month),
-        expires_year: year === "" ? null : Number(year),
-        holder_name: holder.trim() === "" ? null : holder.trim(),
+        number: cardDigits(draft.number),
+        expires_month: draft.month === "" ? null : Number(draft.month),
+        expires_year: draft.year === "" ? null : Number(draft.year),
+        holder_name: draft.holder.trim() === "" ? null : draft.holder.trim(),
         make_default: makeDefault,
       },
       {
@@ -592,7 +598,7 @@ function AddCardFlow({ sellerId, onDone }: { sellerId: string; onDone: () => voi
           setDevCode(result.dev_code ?? null);
         },
         // Whether it worked or not, the number leaves this browser's memory.
-        onSettled: () => setNumber(""),
+        onSettled: () => setDraft((current) => ({ ...current, number: "" })),
       },
     );
   }
@@ -610,65 +616,14 @@ function AddCardFlow({ sellerId, onDone }: { sellerId: string; onDone: () => voi
   }
 
   return (
-    <form className="space-y-4" onSubmit={submit}>
-      <Field label="Karta raqami">
-        <Input
-          value={number}
-          onChange={(event) => setNumber(groupCardNumber(event.target.value))}
-          inputMode="numeric"
-          autoComplete="cc-number"
-          placeholder="8600 1234 5678 9012"
-          maxLength={23}
-          required
-        />
-        <span className="type-caption mt-1 block">
-          Raqam to'g'ridan-to'g'ri to'lov provayderiga yuboriladi. AVTOQISMda faqat oxirgi to'rt
-          raqam saqlanadi.
-        </span>
-      </Field>
+    <form className="space-y-5" onSubmit={submit} aria-busy={add.isPending}>
+      <CardEntry
+        value={draft}
+        onChange={setDraft}
+        numberHint="Raqam to'g'ridan-to'g'ri to'lov provayderiga yuboriladi. AVTOQISMda faqat bank, turi va oxirgi to'rt raqam saqlanadi."
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Amal qilish oyi">
-          <Select
-            value={month}
-            onChange={(event) => setMonth(event.target.value)}
-            autoComplete="cc-exp-month"
-          >
-            <option value="">Tanlang</option>
-            {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
-              <option key={value} value={value}>
-                {value < 10 ? `0${value}` : value}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label="Amal qilish yili">
-          <Select
-            value={year}
-            onChange={(event) => setYear(event.target.value)}
-            autoComplete="cc-exp-year"
-          >
-            <option value="">Tanlang</option>
-            {Array.from({ length: 12 }, (_, index) => thisYear + index).map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
-
-      <Field label="Karta egasi" hint="Kartada yozilganidek.">
-        <Input
-          value={holder}
-          onChange={(event) => setHolder(event.target.value)}
-          autoComplete="cc-name"
-          maxLength={120}
-          placeholder="ALISHER KARIMOV"
-        />
-      </Field>
-
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex min-h-11 items-center gap-2 text-sm">
         <input
           type="checkbox"
           className="size-4 border border-input accent-primary"
@@ -678,13 +633,18 @@ function AddCardFlow({ sellerId, onDone }: { sellerId: string; onDone: () => voi
         Asosiy karta qilish
       </label>
 
-      {add.isError && <p className="text-sm text-destructive">{add.error.message}</p>}
+      {add.isError && (
+        <p role="alert" className="text-sm text-destructive">
+          {add.error.message}
+        </p>
+      )}
 
       <div className="flex gap-2">
-        <Button type="submit" disabled={!valid || add.isPending}>
+        <Button type="submit" className="min-h-11" disabled={!valid || add.isPending}>
+          {add.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {add.isPending ? "Yuborilmoqda…" : "Davom etish"}
         </Button>
-        <Button type="button" variant="ghost" onClick={onDone}>
+        <Button type="button" variant="ghost" className="min-h-11" onClick={onDone}>
           Bekor qilish
         </Button>
       </div>
@@ -720,7 +680,7 @@ function CardCodeStep({
   }
 
   return (
-    <form className="space-y-4" onSubmit={submit}>
+    <form className="space-y-4" onSubmit={submit} aria-busy={verify.isPending}>
       <p className="type-caption">
         Kartaga biriktirilgan telefon raqamiga tasdiqlash kodi yuborildi. Kod kiritilmaguncha bu
         kartaga pul o'tkazilmaydi.
@@ -745,16 +705,26 @@ function CardCodeStep({
         </p>
       )}
 
-      {verify.isError && <p className="text-sm text-destructive">{verify.error.message}</p>}
-      {resend.isError && <p className="text-sm text-destructive">{resend.error.message}</p>}
+      {verify.isError && (
+        <p role="alert" className="text-sm text-destructive">
+          {verify.error.message}
+        </p>
+      )}
+      {resend.isError && (
+        <p role="alert" className="text-sm text-destructive">
+          {resend.error.message}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" disabled={!valid || verify.isPending}>
+        <Button type="submit" className="min-h-11" disabled={!valid || verify.isPending}>
+          {verify.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {verify.isPending ? "Tekshirilmoqda…" : "Tasdiqlash"}
         </Button>
         <Button
           type="button"
           variant="ghost"
+          className="min-h-11"
           disabled={resend.isPending}
           onClick={() =>
             resend.mutate(methodId, {
@@ -764,7 +734,7 @@ function CardCodeStep({
         >
           {resend.isPending ? "Yuborilmoqda…" : "Qayta yuborish"}
         </Button>
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" variant="ghost" className="min-h-11" onClick={onCancel}>
           Keyinroq
         </Button>
       </div>

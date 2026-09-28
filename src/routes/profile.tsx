@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CarFront, Globe, LogOut, Receipt, Settings, ShoppingBag } from "lucide-react";
+import { CarFront, ChevronRight, Receipt, Settings, ShoppingBag } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { EmptyState, Page, PageTitle, SectionHead } from "@/components/avtoqism/Page";
@@ -16,7 +16,7 @@ import { useIsAuthenticated } from "@/lib/query/session";
 import type { OrderOut, OrderStatus } from "@/lib/api/types";
 import { formatDate, formatPhone, formatSom, groupDigits } from "@/lib/format";
 import { useLang, useT } from "@/lib/i18n";
-import { useLogout, useMe } from "@/lib/query/auth";
+import { useMe } from "@/lib/query/auth";
 import { useOrders } from "@/lib/query/commerce";
 import { useActiveVehicle } from "@/lib/query/garage";
 import { cn } from "@/lib/utils";
@@ -57,9 +57,8 @@ function matchesFilter(order: OrderOut, filter: OrderFilter): boolean {
 
 function Profile() {
   const t = useT();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const me = useMe();
-  const logout = useLogout();
   const { activeVehicle } = useActiveVehicle();
   const signedIn = useIsAuthenticated();
   const orders = useOrders();
@@ -143,14 +142,23 @@ function Profile() {
         </Link>
       )}
 
+      {/*
+       * The language switch and the sign-out button used to sit at the bottom
+       * of this page as well as on /settings. They are gone from here, so this
+       * row has to say plainly what is behind it — otherwise somebody who came
+       * to this screen for one of them finds neither and no sign of where they
+       * went.
+       */}
       <nav className="mt-6 divide-y divide-border border-y border-border">
         <Item to="/orders" icon={Receipt} label={t("orders.title")} />
         <Item to="/cart" icon={ShoppingBag} label={t("cart.title")} />
         <Item to="/garage" icon={CarFront} label={t("garage.title")} />
-        {/* The language switch lower down stays where it is — it is the one
-            setting a buyer changes often enough to want it on this screen. The
-            other six live on /settings. */}
-        <Item to="/settings" icon={Settings} label={t("settings.title")} />
+        <Item
+          to="/settings"
+          icon={Settings}
+          label={t("settings.title")}
+          hint="Til, ko'rinish, xavfsizlik, qurilmalar va hisobdan chiqish"
+        />
       </nav>
 
       {/* --- purchase history ------------------------------------------------ */}
@@ -212,7 +220,7 @@ function Profile() {
                   aria-pressed={filter === option.value}
                   onClick={() => setFilter(option.value)}
                   className={cn(
-                    "px-4 py-2.5 text-sm font-semibold transition-colors",
+                    "min-h-11 px-4 py-2.5 text-sm font-semibold transition-colors",
                     filter === option.value
                       ? "bg-foreground text-background"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -255,36 +263,20 @@ function Profile() {
         <AddressBook />
       </section>
 
-      <section className="mt-12">
-        <h2 className="type-h3 mb-4 inline-flex items-center gap-2">
-          <Globe className="size-4" /> {t("profile.language")}
-        </h2>
-        <div className="inline-flex border border-border">
-          {(["uz", "ru"] as const).map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => setLang(l)}
-              aria-pressed={lang === l}
-              className={cn(
-                "px-5 py-2.5 text-sm font-semibold transition-colors",
-                lang === l ? "bg-foreground text-background" : "hover:bg-muted",
-              )}
-            >
-              {l === "uz" ? "O'zbekcha" : "Русский"}
-            </button>
-          ))}
-        </div>
+      {/* Til and Chiqish both live on /settings now. This is the second, quieter
+          pointer to that screen, at the end of the scroll where the sign-out
+          button used to be. */}
+      <section className="mt-12 border-t border-border pt-6">
+        <Link
+          to="/settings"
+          className="inline-flex min-h-11 items-center gap-2 border border-border-strong bg-card px-5 py-3 text-sm font-semibold transition-colors hover:bg-muted"
+        >
+          <Settings className="size-4" aria-hidden /> {t("settings.title")}
+        </Link>
+        <p className="type-caption mt-2">
+          {t("profile.language")}, ko'rinish va hisobdan chiqish shu yerda.
+        </p>
       </section>
-
-      <button
-        type="button"
-        onClick={() => logout.mutate()}
-        disabled={logout.isPending}
-        className="mt-12 inline-flex items-center gap-2 border border-border px-5 py-3 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/5"
-      >
-        <LogOut className="size-4" /> {t("auth.logout")}
-      </button>
     </Page>
   );
 }
@@ -352,15 +344,26 @@ function Item({
   to,
   icon: Icon,
   label,
+  hint,
 }: {
   to: "/orders" | "/cart" | "/garage" | "/settings";
   icon: typeof Receipt;
   label: string;
+  /** What is actually behind the row, when the name alone does not say. */
+  hint?: string | undefined;
 }) {
   return (
-    <Link to={to} className="flex items-center gap-3 py-4 transition-colors hover:text-primary">
-      <Icon className="size-5 text-muted-foreground" />
-      <span className="font-semibold">{label}</span>
+    <Link
+      to={to}
+      className="group flex min-h-14 items-center gap-3 py-4 transition-colors hover:text-primary"
+    >
+      <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">{label}</span>
+        {hint && <span className="type-caption block">{hint}</span>}
+      </span>
+      {/* A row that navigates should look like one. */}
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
     </Link>
   );
 }

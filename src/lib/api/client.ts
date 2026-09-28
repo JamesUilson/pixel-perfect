@@ -36,6 +36,7 @@ function origin(): string {
 const ACCESS_KEY = "avtoqism.access";
 const REFRESH_KEY = "avtoqism.refresh";
 const CART_KEY = "avtoqism.cart";
+const DEVICE_KEY = "avtoqism.device";
 
 /** SSR-safe storage: on the server every read is null and every write a no-op. */
 const store = {
@@ -89,6 +90,43 @@ export const tokens = {
 export const cartToken = {
   get: () => store.get(CART_KEY),
   set: (value: string | null) => store.set(CART_KEY, value),
+};
+
+/**
+ * This browser's own id for itself, sent as `X-Device-Id`.
+ *
+ * It is what lets the connected-devices screen tell one browser from another.
+ * The user agent cannot: two identical Chrome installs send the same string,
+ * so the server would either list every sign-in as a separate device — which
+ * it used to — or sign a second person out of a shared account.
+ *
+ * Generated once and kept, deliberately outliving sign-out: the point is to
+ * recognise the *machine*, and clearing it on sign-out would make the next
+ * sign-in look like a new laptop. It is random and means nothing on its own —
+ * it identifies a browser to this API and is not a fingerprint of the person.
+ *
+ * On the server there is no such thing, so this answers null there and the
+ * header is simply absent, which the API reads as "not a browser".
+ */
+function newDeviceId(): string {
+  const random = globalThis.crypto?.randomUUID?.();
+  if (random) return random;
+  // Older Safari has no randomUUID. Any unique-enough string will do — the
+  // server never interprets it.
+  return `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export const deviceId = {
+  get(): string | null {
+    if (typeof window === "undefined") return null;
+    const existing = store.get(DEVICE_KEY);
+    if (existing) return existing;
+    const minted = newDeviceId();
+    store.set(DEVICE_KEY, minted);
+    // Blocked storage means a new id per request, which is no worse than the
+    // no-id behaviour it replaces: the server just never collapses anything.
+    return store.get(DEVICE_KEY) ?? minted;
+  },
 };
 
 export class ApiError extends Error {
@@ -179,6 +217,9 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
 
     const cart = cartToken.get();
     if (cart) headers["X-Cart-Token"] = cart;
+
+    const device = deviceId.get();
+    if (device) headers["X-Device-Id"] = device;
 
     const init: RequestInit = { method, headers };
     if (body !== undefined) init.body = JSON.stringify(body);
